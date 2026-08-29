@@ -157,6 +157,8 @@ export const en: Record<MsgKey, string> = {
   "companion.open_hint": "A separate dashboard window (full map + stats + team + quests) for a second monitor. Hotkey Ctrl+Alt+D.",
   "companion.no_team": "Not in a survival team.",
   "companion.no_quests": "No Prime quests yet.",
+  "companion.hide_map": "Hide the map (stats only)",
+  "companion.show_map": "Show the map again",
 
   "settings.group_interface": "Interface",
   "settings.group_hud": "In-game HUD",

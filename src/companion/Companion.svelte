@@ -14,6 +14,7 @@
     onDinoUpdate,
     onSettingsChanged,
     onTeamStatus,
+    patchSettings,
     teamStatus,
     type DinoPlayer,
     type DinoStatBar,
@@ -38,6 +39,8 @@
   // and the big map use.
   let basemap = $state("vulnona");
   let colorProfile = $state("default");
+  // Compact = drop the map column, sidebar only (tiny secondary screen).
+  let compact = $state(false);
 
   const quests = $derived(player?.primeQuests ?? []);
   const questsDone = $derived(quests.filter((q) => q.completed).length);
@@ -60,6 +63,11 @@
     colorProfile = (s.color_profile as string) ?? "default";
     document.documentElement.dataset.colorProfile = colorProfile;
     basemap = ((s.map as { basemap?: string } | undefined)?.basemap as string) ?? "vulnona";
+    compact = Boolean((s.companion as { compact?: boolean } | undefined)?.compact);
+  }
+
+  function toggleCompact() {
+    void patchSettings({ companion: { compact: !compact } });
   }
 
   function timeStr(ms: number): string {
@@ -117,13 +125,22 @@
     {#if updatedMs}
       <span class="upd">{$t("dino.updated", { time: timeStr(updatedMs) })}</span>
     {/if}
+    <button
+      class="x"
+      class:on={compact}
+      onclick={toggleCompact}
+      title={$t(compact ? "companion.show_map" : "companion.hide_map")}
+      aria-pressed={compact}
+    >
+      {compact ? "⊞" : "⊟"}
+    </button>
     <button class="x" onclick={close} title={$t("btn.close")} aria-label={$t("btn.close")}>✕</button>
   </header>
 
-  <div class="body">
+  <div class="body" class:compact>
     <div class="map">
       {#key `${basemap}:${colorProfile}`}
-        <FullMap visible={shown} />
+        <FullMap visible={shown && !compact} />
       {/key}
     </div>
 
@@ -192,7 +209,7 @@
         </div>
         {#if roster.length}
           <ul class="roster">
-            {#each roster as m (m.name)}
+            {#each roster as m, mi (mi)}
               <li class:off={!m.online}>
                 <span class="rname">
                   {m.name}{#if m.isSelf}<span class="self"> · {$t("team.you")}</span>{/if}
@@ -233,7 +250,7 @@
             <span class="pfill" style="width: {(questsDone / quests.length) * 100}%"></span>
           </div>
           <ul class="quests">
-            {#each quests as q (q.text)}
+            {#each quests as q, qi (qi)}
               <li class:done={q.completed}>
                 <span class="mark">{q.completed ? "✓" : "○"}</span>
                 <span title={$locale === "vi" && q.textVi ? q.text : undefined}>
@@ -305,11 +322,19 @@
     line-height: 1;
     padding: 0;
   }
+  header .x:first-of-type {
+    margin-left: auto;
+  }
   .upd + .x {
     margin-left: 0;
   }
   .x:hover {
     color: var(--ink);
+    border-color: var(--amber);
+  }
+  .x.on {
+    color: var(--color-bg);
+    background: var(--amber);
     border-color: var(--amber);
   }
 
@@ -318,6 +343,14 @@
     min-height: 0;
     display: grid;
     grid-template-columns: 1fr minmax(300px, 340px);
+  }
+  /* Compact: no map, sidebar fills the window (kept comfortably narrow). */
+  .body.compact {
+    grid-template-columns: minmax(0, 460px);
+    justify-content: center;
+  }
+  .body.compact .map {
+    display: none;
   }
   .map {
     position: relative;

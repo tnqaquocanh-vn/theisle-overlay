@@ -11,21 +11,77 @@
 
 use tauri::{AppHandle, Emitter, Manager, WebviewUrl, WebviewWindowBuilder};
 
+use crate::settings;
+use crate::state::{AppState, LockExt};
 use crate::win::vis;
+
+const DEFAULT_W: f64 = 1280.0;
+const DEFAULT_H: f64 = 820.0;
+const MIN_W: f64 = 760.0;
+const MIN_H: f64 = 520.0;
+
+/// Persist the window's current logical geometry so the next open reappears on
+/// the same monitor at the same size. Called on blur and on close — infrequent
+/// enough to write straight through the settings debouncer.
+fn save_geometry(window: &tauri::WebviewWindow) {
+    let (Ok(pos), Ok(size), Ok(scale)) = (
+        window.outer_position(),
+        window.inner_size(),
+        window.scale_factor(),
+    ) else {
+        return;
+    };
+    // A minimized window reports a 0×0 size and an off-screen sentinel
+    // position on Windows — never persist that.
+    if size.width < 200 || size.height < 200 || pos.x < -30_000 || pos.y < -30_000 {
+        return;
+    }
+    let s = scale.max(0.1);
+    let patch = serde_json::json!({ "companion": {
+        "x": (f64::from(pos.x) / s).round(),
+        "y": (f64::from(pos.y) / s).round(),
+        "w": (f64::from(size.width) / s).round(),
+        "h": (f64::from(size.height) / s).round(),
+    }});
+    let state = window.app_handle().state::<AppState>();
+    {
+        let mut cfg = state.settings.lock_safe();
+        *cfg = settings::merge(&cfg, &patch);
+    }
+    state.request_settings_save();
+}
 
 /// Build the (hidden) companion window. Also the self-heal path if the user
 /// force-closed it or a WebView2 crash took it down.
 fn build_window(app: &AppHandle) -> tauri::Result<tauri::WebviewWindow> {
-    let window =
+    let (w, h, xy) = {
+        let state = app.state::<AppState>();
+        let s = state.settings.lock_safe();
+        let g = |k: &str, d: f64| settings::get_f64(&s, &["companion", k], d);
+        let w = g("w", DEFAULT_W).max(MIN_W);
+        let h = g("h", DEFAULT_H).max(MIN_H);
+        // x / y are null on a first run — center then.
+        let has = |k: &str| settings::get_path(&s, &["companion", k]).and_then(serde_json::Value::as_f64);
+        let xy = match (has("x"), has("y")) {
+            (Some(x), Some(y)) => Some((x, y)),
+            _ => None,
+        };
+        (w, h, xy)
+    };
+
+    let mut builder =
         WebviewWindowBuilder::new(app, "companion", WebviewUrl::App("companion.html".into()))
             .title("The Isle Overlay — Companion")
-            .inner_size(1280.0, 820.0)
-            .min_inner_size(760.0, 520.0)
+            .inner_size(w, h)
+            .min_inner_size(MIN_W, MIN_H)
             .resizable(true)
             .decorations(true)
-            .visible(false)
-            .center()
-            .build()?;
+            .visible(false);
+    builder = match xy {
+        Some((x, y)) => builder.position(x, y),
+        None => builder.center(),
+    };
+    let window = builder.build()?;
 
     if let Ok(hwnd) = window.hwnd() {
         vis::register("companion", hwnd.0 as isize);
@@ -33,15 +89,19 @@ fn build_window(app: &AppHandle) -> tauri::Result<tauri::WebviewWindow> {
 
     // ✕ on the title bar hides the window instead of destroying it, so a
     // reopen is instant and keeps the map's zoom/pan. `toggle` rebuilds only
-    // if something else (a crash) actually removed it.
+    // if something else (a crash) actually removed it. Blur / close also
+    // persist the window's size + position for the next open.
     let w = window.clone();
-    window.on_window_event(move |event| {
-        if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+    window.on_window_event(move |event| match event {
+        tauri::WindowEvent::CloseRequested { api, .. } => {
             api.prevent_close();
+            save_geometry(&w);
             let _ = w.emit("companion://vis", false);
             let _ = w.hide();
             crate::webview_mem::on_hidden(&w);
         }
+        tauri::WindowEvent::Focused(false) => save_geometry(&w),
+        _ => {}
     });
 
     Ok(window)

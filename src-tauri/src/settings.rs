@@ -137,6 +137,16 @@ pub fn default_settings() -> Value {
         "bigmap": {
             "opacity": 0.96,
         },
+        // A7: the second-monitor companion window. Geometry (logical px) is
+        // remembered across sessions; x/y null until first placed. `compact`
+        // drops the map column so a tiny secondary screen shows stats only.
+        "companion": {
+            "w": 1280,
+            "h": 820,
+            "x": null,
+            "y": null,
+            "compact": false,
+        },
         // P5: named overlay-look snapshots. [{ name, patch }].
         "presets": [],
         "hotkeys": {

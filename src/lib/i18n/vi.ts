@@ -172,6 +172,8 @@ export const vi = {
   "companion.open_hint": "Một cửa sổ dashboard riêng (bản đồ lớn + chỉ số + đồng đội + nhiệm vụ) cho màn hình thứ hai. Phím tắt Ctrl+Alt+D.",
   "companion.no_team": "Chưa vào nhóm sinh tồn.",
   "companion.no_quests": "Chưa có nhiệm vụ Prime.",
+  "companion.hide_map": "Ẩn bản đồ (chỉ hiện chỉ số)",
+  "companion.show_map": "Hiện lại bản đồ",
 
   // --- cài đặt ---
   "settings.group_interface": "Giao diện",

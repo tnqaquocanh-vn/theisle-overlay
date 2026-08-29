@@ -4,6 +4,25 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.28.1] — 2026-08-30
+
+### Sửa lỗi
+
+- **Tab Khủng long (và bảng phụ) sập khi khủng long có 2 nhiệm vụ Prime trùng
+  tên.** Danh sách Prime được `{#each}` khoá theo *nội dung nhiệm vụ*, mà game
+  hoàn toàn có thể giao 2 nhiệm vụ chữ y hệt nhau → Svelte ném
+  `each_key_duplicate` → cả tab rơi vào ranh giới lỗi ("Phần Khủng long gặp
+  lỗi"). Nay khoá theo chỉ số. Sửa ở cả 4 chỗ: danh sách Prime + roster đội
+  trong tab Khủng long, và trong cửa sổ bảng phụ. Kèm test hồi quy
+  `dino-dupe-quests`.
+
+### Thêm
+
+- **Bảng phụ nhớ kích thước + vị trí.** Cửa sổ Companion giờ mở lại đúng chỗ
+  và đúng cỡ bạn để lần trước (lưu khi rời cửa sổ / đóng). Nút **⊟/⊞** trên
+  thanh tiêu đề bật **chế độ gọn** — ẩn bản đồ, chỉ hiện cột chỉ số/đội/nhiệm
+  vụ (hợp màn phụ nhỏ). `settings.companion` giữ `w/h/x/y/compact`.
+
 ## [1.28.0] — 2026-08-30
 
 ### Thêm

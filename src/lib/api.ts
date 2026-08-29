@@ -77,6 +77,8 @@ export type Settings = Record<string, unknown> & {
   sound?: { enabled: boolean };
   /** In-app auto-update: check the release feed once on startup. */
   updates?: { auto_check: boolean };
+  /** A7 second-monitor companion: remembered geometry + compact (map-less) mode. */
+  companion?: { w: number; h: number; x: number | null; y: number | null; compact: boolean };
   islepilot: {
     enabled: boolean;
     /** "token" = one Steam login for every server; "legacy" = per-server cookie. */

@@ -686,7 +686,11 @@
               ></span>
             </div>
             <ul>
-              {#each player.primeQuests as quest (quest.text)}
+              <!-- Key by index: Prime quest text is NOT unique (the game can
+                   hand out two objectives with identical text), and a keyed
+                   dup throws each_key_duplicate. The list is replaced whole
+                   each poll and rendered in order, so index is stable. -->
+              {#each player.primeQuests as quest, qi (qi)}
                 <li class:done={quest.completed}>
                   <span class="mark">{quest.completed ? "✓" : "○"}</span>
                   <!-- Vietnamese when available; the English original stays a
@@ -776,7 +780,8 @@
 
           {#if team.roster.length > 0}
             <ul class="mt-1 space-y-1.5">
-              {#each team.roster as m (m.name + (m.isSelf ? "*" : ""))}
+              <!-- Index-keyed: two teammates can pick the same display name. -->
+              {#each team.roster as m, mi (mi)}
                 <li class="text-xs" style="opacity: {m.online ? 1 : 0.45}">
                   <div class="flex items-center justify-between">
                     <span style="color: var(--color-text)">
