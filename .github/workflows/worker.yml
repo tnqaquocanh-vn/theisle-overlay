@@ -27,6 +27,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -44,7 +46,10 @@ jobs:
         working-directory: worker
         run: npm run typecheck
 
+      # Skips cleanly (green) until the Cloudflare secrets are set — the
+      # telemetry / team-relay backend is optional.
       - name: Deploy
+        if: ${{ env.CF_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
