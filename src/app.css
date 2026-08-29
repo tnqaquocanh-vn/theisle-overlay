@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* Amber design tokens — generated from src/lib/tokens.data.js (B1 contract).
+   Defines --ground/--panel/--amber/… plus the legacy --color-* aliases the
+   components already use, --font-*, --dur-*, --ease-*, --radius-*. */
+@import "./lib/tokens.gen.css";
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}

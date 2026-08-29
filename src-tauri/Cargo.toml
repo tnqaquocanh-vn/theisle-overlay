@@ -1,0 +1,87 @@
+[package]
+name = "theisle-overlay"
+version = "1.28.0"
+description = "Map overlay for The Isle: Evrima (Gateway)"
+edition = "2021"
+default-run = "theisle-overlay"
+
+[workspace]
+members = ["crates/overlay-core", "crates/localpos"]
+
+[lib]
+name = "theisle_overlay_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[features]
+# Dev-only tools (verify_data). Not part of the shipped app.
+devtools = ["dep:image"]
+
+[[bin]]
+name = "verify_data"
+path = "src/bin/verify_data.rs"
+required-features = ["devtools"]
+
+[[bin]]
+name = "theisle-overlay"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+overlay-core = { path = "crates/overlay-core" }
+localpos = { path = "crates/localpos" }
+tauri = { version = "2", features = ["protocol-asset", "tray-icon"] }
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
+tauri-plugin-deep-link = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-log = "2"
+tauri-plugin-notification = "2"
+# In-app auto-update: checks a signed latest.json on GitHub Releases, downloads
+# + runs the NSIS installer, then plugin-process restarts the app.
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+serde = { version = "1", features = ["derive"] }
+reqwest = { version = "0.12", features = ["blocking", "gzip"] }
+regex = "1"
+scraper = "0.20"
+# Direct ICoreWebView2 access for TrySuspend/memory-target (hidden-window RAM).
+# Version must match what wry uses. webview2-com builds on windows 0.61 while
+# the rest of the app uses windows 0.62, so its Interface trait comes from a
+# separate windows-core 0.61 (only used inside webview_mem.rs).
+webview2-com = "0.38"
+windows-core = "0.61"
+image = { version = "0.25", optional = true, default-features = false, features = ["webp", "png"] }
+serde_json = "1"
+log = "0.4"
+chrono = "0.4"
+uuid = { version = "1", features = ["v4"] }
+# Request signing for the analytics API (telemetry/attest.rs).
+hmac = "0.12"
+sha2 = "0.10"
+# G1 local position: load Npcap's wpcap.dll at RUNTIME (no build-time SDK, and
+# a clean "not installed" path). Only touched when the opt-in feature is on.
+libloading = "0.8"
+# G5 IslePilot realtime: blocking WebSocket client for wss://islepilot.eu/ows.
+# native-tls reuses the TLS stack reqwest already pulls in.
+tungstenite = { version = "0.24", features = ["native-tls"] }
+
+[dependencies.windows]
+version = "0.62"
+features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Gdi",
+  "Win32_NetworkManagement_IpHelper",
+  "Win32_Networking_WinSock",
+  "Win32_Security_Cryptography",
+  "Win32_System_DataExchange",
+  "Win32_System_Diagnostics_ToolHelp",
+  "Win32_System_Memory",
+  "Win32_System_LibraryLoader",
+  "Win32_System_Registry",
+  "Win32_System_Threading",
+  "Win32_UI_Input",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_WindowsAndMessaging",
+]

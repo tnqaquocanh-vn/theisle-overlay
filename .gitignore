@@ -1,0 +1,25 @@
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/schemas/
+*.log
+.wrangler/
+.dev.vars
+
+# Playwright visual-regression: keep tests/visual/__screenshots__ (the golden
+# baselines), drop the run artifacts.
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# Updater signing keys — NEVER commit
+*.key
+*.key.pub
+
+# Machine-local Claude Code settings
+.claude/settings.local.json
+
+# Prebuilt installers (releases come from CI now)
+*_x64-setup.exe
+*_x64-setup.exe.sig

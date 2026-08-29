@@ -1,0 +1,22 @@
+{
+  // Team-relay-ONLY deploy. No D1, no Analytics Engine, no rate limits, no
+  // cron — nothing that needs an account feature turned on. Just the
+  // `TeamRoom` Durable Object (SQLite-backed = works on Workers Free).
+  //
+  //   npm run deploy:team
+  //
+  // Gives  https://isle-team-relay.<your-subdomain>.workers.dev  — paste that
+  // into the app: Your Dino -> Survival team -> Advanced -> Relay URL.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "isle-team-relay",
+  "main": "src/team-entry.ts",
+  "compatibility_date": "2026-08-01",
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "preview_urls": false,
+
+  "durable_objects": {
+    "bindings": [{ "name": "TEAM", "class_name": "TeamRoom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["TeamRoom"] }]
+}

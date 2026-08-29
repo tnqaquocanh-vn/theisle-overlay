@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>minimap render() bench</title>
+    <style>
+      body {
+        margin: 0;
+        background: #111;
+        font: 13px/1.5 monospace;
+        color: #ddd;
+      }
+      #out {
+        padding: 1rem;
+        white-space: pre;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div id="out">running…</div>
+    <script type="module">
+      // B3 — frame-time tripwire for the minimap renderer. Drives render() many
+      // times simulating a heading-ease burst (the heading changes, the player
+      // px does NOT — so the basemap crop cache should hold and each frame is
+      // cheap). The spec asserts the mean stays under a budget; a regression
+      // (cache removed, an expensive per-frame op added) blows it.
+      import { render, _bgRecrops } from "/src/minimap/render.ts";
+
+      const SIZE = 2400;
+      const oc = new OffscreenCanvas(SIZE, SIZE);
+      const g = oc.getContext("2d");
+      for (let y = 0; y < SIZE; y += 200) {
+        for (let x = 0; x < SIZE; x += 200) {
+          g.fillStyle = `hsl(${(x + y) % 360} 40% 30%)`;
+          g.fillRect(x, y, 200, 200);
+        }
+      }
+      const basemap = await createImageBitmap(oc);
+
+      const emptyBar = () => ({ current: null, max: null });
+      const state = {
+        position: { xCm: 1e7, yCm: 2e7, px: 1200, py: 1200, headingDeg: 0 },
+        headingDisplayDeg: 0,
+        rotateWithHeading: false,
+        trailPx: [
+          [
+            [1170, 1170],
+            [1185, 1185],
+            [1200, 1200],
+          ],
+        ],
+        pois: [],
+        waypoints: [],
+        party: [],
+        pings: [],
+        explored: [],
+        showExplored: false,
+        nearestWaypoint: null,
+        basemap,
+        freshwater: null,
+        miniScale: 1,
+        pxPerM: 0.7,
+        sizePx: 260,
+        radiusM: 300,
+        opacity: 0.85,
+        showTrail: true,
+        showWaypoints: true,
+        showFreshwater: true,
+        panelH: 0,
+        dino: null,
+        questsH: 0,
+        quests: [],
+        teamH: 0,
+        team: [],
+        hudScale: 1,
+        dinoEtaAdultMin: null,
+        questLang: "vi",
+        compassLetters: ["B", "Đ", "N", "T"],
+        hintText: "",
+        headingLabel: "N 0°",
+        headingUnknown: "?",
+        positionStale: false,
+        staleLabel: "",
+        snapshotToast: null,
+        onlineLabel: "ONLINE",
+        offlineLabel: "OFF",
+        nutri: {
+          label: "",
+          ok: "",
+          short: { carb: "", protein: "", lipid: "" },
+          herb: "",
+          hint: {
+            carnCarb: "",
+            carnProt: "",
+            carnLip: "",
+            omniCarb: "",
+            omniProt: "",
+            omniLip: "",
+          },
+        },
+        colorProfile: "default",
+        skin: "obsidian",
+        diagnostics: false,
+      };
+
+      const canvas = document.getElementById("c");
+      // Warm up (first call crops the basemap once, sizes the canvas).
+      for (let i = 0; i < 5; i++) render(canvas, state);
+
+      const recropsBefore = _bgRecrops();
+      const N = 300;
+      const t0 = performance.now();
+      for (let i = 0; i < N; i++) {
+        state.headingDisplayDeg = (state.headingDisplayDeg + 1.7) % 360;
+        render(canvas, state);
+      }
+      const meanMs = (performance.now() - t0) / N;
+      const recropsInBurst = _bgRecrops() - recropsBefore;
+
+      window.__bench = { meanMs, n: N, recropsInBurst };
+      document.getElementById("out").textContent =
+        `render() mean over ${N} frames: ${meanMs.toFixed(3)} ms`;
+    </script>
+  </body>
+</html>
