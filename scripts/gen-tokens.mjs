@@ -113,7 +113,9 @@ if (CHECK) {
   } catch {
     /* missing == stale */
   }
-  if (current !== css) {
+  // Compare line-ending-agnostic: a Windows checkout (or git autocrlf) can
+  // hand us CRLF even though the generator only ever writes LF.
+  if (current.replace(/\r\n/g, "\n") !== css.replace(/\r\n/g, "\n")) {
     console.error(
       "tokens.gen.css is out of date — run:  node scripts/gen-tokens.mjs",
     );
