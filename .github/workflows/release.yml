@@ -6,7 +6,11 @@ name: Release
 #                                      (`src-tauri/tauri.conf.json` holds the
 #                                      matching pubkey). Generate once with
 #                                      `npx tauri signer generate`.
-#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  That key's password ("" if none).
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  Only if the key HAS a password. GitHub
+#                                      rejects empty-value secrets, so for a
+#                                      no-password key just don't create this
+#                                      one — the env below then resolves to ""
+#                                      which signs a no-password key fine.
 #   TELEMETRY_MASTER                    32 random bytes as hex; same value as
 #                                      the Worker's ATTEST_MASTER secret.
 #                                      Optional: without it the build simply
