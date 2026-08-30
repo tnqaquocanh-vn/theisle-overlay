@@ -4,6 +4,28 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.36.2] — 2026-08-30
+
+### Đổi
+
+- **Áp skin vào game giờ là bấm nút, không còn tự động.** Trong trình chỉnh
+  skin, chọn màu xong bấm **"☁ Áp dụng vào game"** để đẩy màu vào game qua
+  IslePilot. Bỏ ô "áp trực tiếp" cũ — kéo màu không còn spam socket / giật
+  game. Bản xem trước 3D ở trình chỉnh vẫn cập nhật tức thì như trước.
+- Nút cho biết trạng thái: **"☁ Áp dụng vào game"** khi có thay đổi chưa đẩy,
+  **"✓ Áp dụng lại"** khi đã khớp với game (bấm lại để đẩy lại, ví dụ sau khi
+  khủng long hồi sinh). Có báo lại: *"Đã áp dụng vào game"* khi thành công, hoặc
+  *"IslePilot chưa kết nối — sẽ tự áp khi vào lại"* nếu socket đang rớt. Nút có
+  khoá ~1 giây để bấm dồn không spam được.
+- Nạp preset (máy hoặc cloud) chỉ đổ màu vào trình chỉnh — không tự vào game;
+  bấm nút mới đẩy.
+
+### Kỹ thuật
+
+- IslePilot realtime (`realtime.rs`) theo dõi trạng thái kết nối; lệnh
+  `islepilot_send_liveskin` trả về `true/false` để app biết frame đã đi ngay hay
+  đang xếp hàng chờ kết nối lại.
+
 ## [1.36.1] — 2026-08-30
 
 ### Đổi
