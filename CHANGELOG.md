@@ -4,6 +4,19 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.36.1] — 2026-08-30
+
+### Đổi
+
+- **Chỗ nhận "Mã miễn phí" nổi bật hẳn lên.** Trong **Cài đặt → Người ủng hộ**,
+  nút **"🎁 Dùng thử 3 ngày miễn phí"** giờ là nút lớn full-chiều-ngang, nằm
+  chung một khung với ô dán mã (`hoặc đã có mã?`) — không còn bị lẫn dưới danh
+  sách quyền lợi. Ô dán mã cũng hiện trong lúc đang dùng thử (để đổi sang mã
+  thật giữa chừng).
+- **Bỏ điều kiện "mở app 3 lần mới cho dùng thử"** — nhiều người mới không thấy
+  nút ở đâu. Chỉ cần mở app một lần. Chống lạm dụng vẫn nằm ở máy chủ (một máy
+  một lần theo vân tay, trần theo IP mỗi ngày, chặn máy ảo).
+
 ## [1.36.0] — 2026-08-30
 
 ### Thêm
