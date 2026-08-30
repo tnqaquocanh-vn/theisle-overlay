@@ -4,6 +4,22 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.31.1] — 2026-08-30
+
+### Sửa
+
+- **Hoàn tác đổi mã định danh.** `tauri.conf.json` `identifier` quay lại
+  `io.github.mxhios.theisle-overlay` (v1.31.0 đã đổi thành `com.bumbum.*`).
+  Lý do: Tauri khoá khoá gỡ cài đặt (registry) theo `identifier`, nên đổi nó
+  làm bản cũ update tự động lên v1.31.0 để lại một mục "thừa" trong *Add or
+  remove programs*. Giữ đúng chuỗi cũ = mọi lần update tự động đều liền mạch.
+  Chuỗi này chỉ nằm trong registry/installer, người dùng không thấy; công tác
+  giả gốc đã được ghi ở `THIRD-PARTY-NOTICES.md`.
+  **Đừng đổi lại giá trị này** — mọi bản đã phát hành đều dùng nó.
+- Dữ liệu/cài đặt người dùng không bị ảnh hưởng ở cả hai chiều (chúng nằm ở
+  `%APPDATA%\TheIsleOverlay`, dùng hằng số `APP_DIR_NAME`, không dính
+  `identifier`).
+
 ## [1.31.0] — 2026-08-30
 
 ### Thêm
