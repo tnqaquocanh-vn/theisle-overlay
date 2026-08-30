@@ -4,6 +4,24 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.36.0] — 2026-08-30
+
+### Thêm
+
+- **Ghi chú thay đổi hiện ngay trong app.** Khi có bản mới, banner cập nhật có
+  mục **"Có gì mới"** bung ra được, lấy đúng phần CHANGELOG của phiên bản đó —
+  không cần mở GitHub. Mục này ở Cài đặt cũng mở sẵn.
+
+### Sửa
+
+- **`latest.json` trỏ sai tên file** → auto-update báo 404. GitHub đổi dấu cách
+  trong tên file cài thành dấu chấm (`TheIsle Overlay_…` → `TheIsle.Overlay_…`);
+  workflow giờ lấy đúng tên GitHub đã lưu, ghi `latest.json` **không BOM**, và
+  tự kiểm tra URL trả về 200 trước khi kết thúc. Bản `v1.35.0` đã được vá tay.
+- CI (`ci.yml`) + Release (`release.yml`) ép `CARGO_TARGET_DIR` vào thư mục
+  workspace (config ghi cứng đường dẫn máy maintainer) → cache Rust hoạt động,
+  CI nhanh hơn, và bản cài nằm đúng chỗ.
+
 ## [1.35.0] — 2026-08-30
 
 ### Thêm
