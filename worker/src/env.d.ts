@@ -14,6 +14,10 @@ export interface Env {
   ATTEST_MASTER: string;
   /** Bearer token for /admin/*. */
   ADMIN_TOKEN: string;
+  /** Ko-fi webhook "Verification Token" (Ko-fi → Settings → API). */
+  KOFI_VERIFICATION_TOKEN?: string;
+  /** Minimum Ko-fi donation (seller currency) that mints a key. Default 1.5. */
+  KOFI_MIN?: string;
   /** Cloudflare API token with Account Analytics Read, for the AE SQL API. */
   AE_QUERY_TOKEN?: string;
   AE_ACCOUNT_ID?: string;

@@ -1556,6 +1556,36 @@ pub fn alerts_test(app: AppHandle) {
     crate::islepilot::alerts::test_notification(&app);
 }
 
+// --- supporter license ----------------------------------------------------
+
+/// Current supporter status from the local (signed) cache — no network.
+#[tauri::command]
+pub fn license_status() -> crate::license::LicenseStatus {
+    crate::license::status()
+}
+
+/// Validate a pasted key against the server and, on success, persist it.
+#[tauri::command]
+pub async fn license_activate(key: String) -> Result<crate::license::LicenseStatus, String> {
+    tauri::async_runtime::spawn_blocking(move || crate::license::activate(&key))
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Re-check the stored key against the server (the "Check again" button).
+#[tauri::command]
+pub async fn license_refresh() -> Result<crate::license::LicenseStatus, String> {
+    tauri::async_runtime::spawn_blocking(crate::license::refresh)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Forget the stored key — drops back to the free tier immediately.
+#[tauri::command]
+pub fn license_clear() -> crate::license::LicenseStatus {
+    crate::license::deactivate()
+}
+
 /// Dev-only: feed a fake sample through the real pipeline.
 #[cfg(debug_assertions)]
 #[tauri::command]

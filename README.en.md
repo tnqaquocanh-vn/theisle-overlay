@@ -2,15 +2,19 @@
 
 [Tiếng Việt](README.md) · **English**
 
-Map overlay for **The Isle: Evrima** (Gateway). Circular minimap pinned to the
-game window · full map with POIs, place names, waypoints and travel trails ·
-dino stats + Garage (Gacha) with **3D preview** from the IslePilot system, one
-Steam login **for every server** · bilingual VI/EN interface · one-click
-install with auto-update.
+Map overlay for **The Isle: Evrima** (Gateway) — **built by BumBum**. A
+comprehensive rewrite: a lean Rust + Tauri core plus a number of features not in
+the original.
 
-▶️ **Install & usage video guide** (Vietnamese):
+Circular minimap pinned to the game window · full map with POIs, place names,
+waypoints and travel trails · **session replay** with a scrubber · a **companion
+window** for a second monitor · dino stats + Garage (Gacha) with **3D preview**
+and **slay** from the IslePilot system · a **skin editor** with 3D preview and
+in-game code export · one Steam login **for every server** · bilingual VI/EN
+interface · one-click install with auto-update.
 
-[![TheIsle Overlay video guide](https://img.youtube.com/vi/R2IzwqHapuw/hqdefault.jpg)](https://y2u.be/R2IzwqHapuw)
+<!-- TODO(BumBum): record your own install & usage video and drop the link
+     here. The previous author's video has been removed. -->
 
 ![Minimap and dino stats over the running game](docs/screenshot-ingame.jpg)
 
@@ -44,7 +48,14 @@ install with auto-update.
   login works on **every IslePilot server** — switch servers and the data follows.
 - **Garage (Gacha) with 3D preview**: each parked dino is a card with an
   orbitable **3D model in its own skin colours** + growth + Park/Restore/
-  Rename/Sell; models download once and open instantly (and offline) after.
+  Rename/Sell/**Slay**; models download once and open instantly (and offline) after.
+- **Skin editor**: 10 colour channels + pattern, real-time preview on the 3D
+  model, saved presets, **skin code you paste straight into the game**, and
+  (supporters) *live-apply* onto the dino you're playing via IslePilot.
+- **Session replay**: scrub your position + stats over time, export the path to
+  a shareable `.geojson`.
+- **Companion window**: a separate dashboard for a second monitor — stats, map,
+  team, quests; remembers its geometry, has a compact mode.
 - **Global hotkeys** rebindable in-app, bilingual UI, automatic updates.
 
 ## Install
@@ -219,6 +230,10 @@ your machine, not a redistribution.
   Steam guide.
 
 Unaffiliated with Afterthought LLC.
+
+Licensed **MIT** — see [`LICENSE`](LICENSE). This app is a derivative work; the
+full list of open-source components and copyright notices is in
+[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
 
 ## Contact & Support
 

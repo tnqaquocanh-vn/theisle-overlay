@@ -25,10 +25,12 @@
     type Settings,
   } from "$lib/api";
   import { LOCALES, t } from "$lib/i18n";
+  import { license } from "$lib/license.svelte";
   import Toggle from "$lib/ui/Toggle.svelte";
   import Slider from "$lib/ui/Slider.svelte";
   import HotkeyEditor from "./HotkeyEditor.svelte";
   import UpdateCard from "./UpdateCard.svelte";
+  import SupporterCard from "./SupporterCard.svelte";
 
   let settings = $state<Settings | null>(null);
   let refetching = $state(false);
@@ -397,20 +399,24 @@
       </p>
     </section>
 
-    <!-- Companion window (A7, v1.27) -->
+    <!-- Companion window (A7, v1.27) — supporter-gated since v1.31 -->
     <section>
       <h2 class="mb-2 font-semibold" style="color: var(--color-accent)">
         {$t("companion.title")}
+        {#if license.tier !== "supporter"}
+          <span class="ml-1 text-xs" style="color: var(--color-muted)">★ {$t("sup.badge")}</span>
+        {/if}
       </h2>
       <button
-        class="cursor-pointer rounded border px-3 py-1 text-sm"
+        class="cursor-pointer rounded border px-3 py-1 text-sm disabled:opacity-50"
         style="border-color: var(--color-border)"
+        disabled={license.tier !== "supporter"}
         onclick={() => void invoke("toggle_companion")}
       >
         {$t("companion.open")}
       </button>
       <p class="mt-2 text-xs leading-relaxed" style="color: var(--color-muted)">
-        {$t("companion.open_hint")}
+        {license.tier === "supporter" ? $t("companion.open_hint") : $t("sup.locked_hint")}
       </p>
     </section>
     </div>
@@ -533,6 +539,9 @@
 
     <div class="setgroup">
       <p class="eyebrow">{$t("settings.group_advanced")}</p>
+
+    <!-- Supporter license (v1.31) -->
+    <SupporterCard />
 
     <!-- In-app auto-update -->
     <UpdateCard

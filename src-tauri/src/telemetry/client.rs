@@ -29,7 +29,7 @@ use super::attest;
 // Point this at your own deployed `worker/` (Cloudflare). Until then telemetry
 // is inert: the release build ships with an empty signing key when
 // TELEMETRY_MASTER is unset, so nothing is ever sent.
-const API_BASES: [&str; 1] = ["https://theisle-overlay-api.bumbum.workers.dev"];
+const API_BASES: [&str; 1] = ["https://theisle-overlay-api.quocanh.workers.dev"];
 
 const TIMEOUT: Duration = Duration::from_secs(5);
 

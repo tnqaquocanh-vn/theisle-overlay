@@ -4,6 +4,58 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.31.0] — 2026-08-30
+
+### Thêm
+
+- **Hệ thống người ủng hộ (license).** Toàn bộ tính năng cốt lõi vẫn miễn phí;
+  một vài tiện ích nâng cao mở khoá bằng mã ủng hộ **trọn đời** (`BUMBUM-XXXX-
+  XXXX-XXXX`). Mục **Cài đặt → Người ủng hộ**: dán mã → Kích hoạt; hiển thị
+  trạng thái, nút Kiểm tra lại / Gỡ mã; link "Lấy mã ủng hộ".
+  - Xác thực qua `worker/` (`POST /v1/license/validate`), buộc theo một vân tay
+    máy mềm (env-based, HMAC-SHA256) với **2 lần đổi máy/tháng**.
+  - Kết quả lưu cache cục bộ có **chữ ký HMAC** (`%APPDATA%\TheIsleOverlay\
+    license.json`): tin trong 14 ngày offline, ân hạn thêm 3 ngày, sau đó khoá
+    lại phần nâng cao — **phần cốt lõi không bao giờ bị khoá**.
+  - Cấp mã: thủ công (`POST /admin/license/mint`) cho người thân/bạn bè, hoặc
+    **tự động qua webhook Ko-fi** (`POST /v1/license/kofi`).
+- **Giới hạn phiên bản miễn phí (đợt thí điểm):**
+  - Cửa sổ **Bảng phụ** (companion, màn hình 2) → người ủng hộ. Nút mở bị khoá
+    kèm gợi ý; phím tắt Ctrl+Alt+D hiện thông báo nhẹ thay vì mở.
+  - **Trình chỉnh skin**: bản miễn phí lưu tối đa **3 skin** ở máy; người ủng hộ
+    không giới hạn. (Áp skin trực tiếp + preset đám mây sẽ chuyển sang người
+    ủng hộ ở đợt sau.)
+
+### Đổi
+
+- **README** viết lại phần giới thiệu theo BumBum: gỡ video hướng dẫn của tác
+  giả cũ, bổ sung các tính năng đã thêm (xem lại hành trình, bảng phụ, trình
+  chỉnh skin, giết khủng long), trỏ giấy phép về `LICENSE` +
+  `THIRD-PARTY-NOTICES.md`.
+- **Giấy phép:** thêm `LICENSE` (MIT — BumBum, có giữ dòng bản quyền nguồn gốc)
+  và `THIRD-PARTY-NOTICES.md` (liệt kê đầy đủ IsleLiveMap, overlay gốc, nguồn
+  skin, font, dữ liệu bản đồ).
+- **Định danh app** đổi thành `com.bumbum.theisle-overlay` (dữ liệu người dùng
+  KHÔNG mất — thư mục dữ liệu dùng hằng số `TheIsleOverlay`, không phải
+  identifier).
+- Build release siết lại (`[profile.release]`: `strip`, `lto = "fat"`,
+  `codegen-units = 1`, `opt-level = "s"` — không `panic = "abort"`) để giảm khả
+  năng sao chép/đọc ngược.
+
+### Kỹ thuật
+
+- Rust: `src-tauri/src/license.rs` (client + cache ký HMAC + `is_supporter()`
+  qua `AtomicBool`); lệnh `license_status` / `license_activate` /
+  `license_refresh` / `license_clear`; `companion::toggle` chặn khi chưa phải
+  người ủng hộ và phát sự kiện `license://required`.
+- Worker: bảng `license` (`0002_licenses.sql`), `worker/src/license.ts`
+  (validate + Ko-fi webhook + admin mint/revoke/list), biến môi trường
+  `KOFI_VERIFICATION_TOKEN` / `KOFI_MIN`.
+- Frontend: `src/lib/license.svelte.ts` (`isSupporter()`), `api.ts` wrappers +
+  `LicenseStatus`, `onSupporterRequired`; `SupporterCard.svelte`; App.svelte
+  nạp trạng thái khi khởi động + toast "cần người ủng hộ".
+- Allowlist mở URL thêm `ko-fi.com`, `www.paypal.com`, `paypal.me`.
+
 ## [1.30.1] — 2026-08-30
 
 ### Đổi

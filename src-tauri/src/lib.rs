@@ -13,6 +13,7 @@ pub mod explored;
 pub mod fetch;
 pub mod hotkeys;
 pub mod islepilot;
+pub mod license;
 pub mod localpos;
 pub mod minimap;
 pub mod pipeline;
@@ -153,6 +154,10 @@ pub fn run(replay_file: Option<PathBuf>) {
             commands::dino_history,
             commands::dino_history_clear,
             commands::alerts_test,
+            commands::license_status,
+            commands::license_activate,
+            commands::license_refresh,
+            commands::license_clear,
             commands::localpos_status,
             commands::copy_map_snapshot,
             bigmap::toggle_bigmap,
@@ -266,6 +271,11 @@ pub fn run(replay_file: Option<PathBuf>) {
             localpos::apply_settings(app.handle());
             // G7 mouse gestures: only if settings.minimap.mouse_gestures.
             win::raw_input::apply_settings(app.handle());
+            // Prime the in-memory supporter flag from the signed cache, then
+            // re-validate in the background if it's a day stale. Gate checks
+            // (companion, skin presets) read the flag, never the disk.
+            let _ = license::status();
+            license::refresh_if_stale();
             // Last, and on its own thread: nothing above may wait on it.
             telemetry::spawn(app.handle());
             if let Some(path) = replay_file {

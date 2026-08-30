@@ -16,7 +16,10 @@
       "identifier": "opener:allow-open-url",
       "allow": [
         { "url": "https://github.com/tnqaquocanh-vn/*" },
-        { "url": "https://islepilot.eu/*" }
+        { "url": "https://islepilot.eu/*" },
+        { "url": "https://ko-fi.com/*" },
+        { "url": "https://www.paypal.com/*" },
+        { "url": "https://paypal.me/*" }
       ]
     },
     "log:default",

@@ -115,6 +115,14 @@ pub fn create(app: &AppHandle) -> tauri::Result<()> {
 /// Ctrl+Alt+D, the "Open companion" button, and `toggle_companion`. Hide when
 /// it is the window in front; otherwise bring it up (un-minimise + focus).
 pub fn toggle(app: &AppHandle) {
+    // Supporter-gated (v1.31). A non-supporter can never open it, so there is
+    // nothing on screen to hide — just nudge them to the Settings card.
+    if !crate::license::is_supporter() {
+        let _ = app.emit("license://required", "companion");
+        log::info!("companion: blocked — supporter only");
+        return;
+    }
+
     let on_screen = vis::is_visible("companion").unwrap_or(false)
         && !vis::is_minimized("companion").unwrap_or(false)
         && vis::is_foreground("companion");

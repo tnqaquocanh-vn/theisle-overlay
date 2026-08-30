@@ -11,6 +11,7 @@ import { handleAdmin } from "./admin";
 import { handleCrash } from "./crash";
 import { runCron } from "./cron";
 import { handleFeedback } from "./feedback";
+import { handleLicense, handleLicenseAdmin } from "./license";
 import { handlePing } from "./ping";
 import { handleTeam } from "./team";
 import type { Env } from "./env";
@@ -31,6 +32,8 @@ export default {
           return handleCrash(req, env);
       }
     }
+    if (path.startsWith("/v1/license/")) return handleLicense(req, env, path);
+    if (path.startsWith("/admin/license/")) return handleLicenseAdmin(req, env, path);
     if (path.startsWith("/admin/")) return handleAdmin(req, env, path);
     if (path.startsWith("/v1/team/")) return handleTeam(req, env, path);
 

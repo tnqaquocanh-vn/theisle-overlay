@@ -18,7 +18,7 @@
   "assets": { "directory": "./public" },
 
   "d1_databases": [
-    { "binding": "DB", "database_name": "isle", "database_id": "d73574f8-3c16-48e7-adc9-614fd33d1599" }
+    { "binding": "DB", "database_name": "isle", "database_id": "a1ca9899-70ca-42b3-99e7-b5402dea5202" }
   ],
 
   "analytics_engine_datasets": [{ "binding": "AE", "dataset": "overlay" }],

@@ -52,6 +52,9 @@ export const en: Record<MsgKey, string> = {
   "skin.cloud_presets": "IslePilot presets",
   "skin.cloud_saved": "Saved to IslePilot",
   "skin.cloud_err": "IslePilot error: {err}",
+  "skin.preset_cap": "The free build stores up to {n} skins. Become a supporter for unlimited.",
+  "skin.preset_cap_hint":
+    "Reached the free build's {n}-skin limit — delete one, or unlock unlimited in the Supporters section (Settings).",
 
   "pos.none": "No position yet",
   "pos.hint":
@@ -551,6 +554,38 @@ export const en: Record<MsgKey, string> = {
   "update.auto_check_hint":
     "Only fetches a small version-info file (latest.json) from the releases page. " +
     "Never downloads or installs on its own — it always asks first.",
+
+  // --- supporters (license) ---
+  "sup.title": "Supporters",
+  "sup.badge": "Supporter",
+  "sup.pitch":
+    "Every core feature (map, minimap, waypoints, trail, dino stats, Garage, " +
+    "basic skin editor) is always free. A few power-user extras are supporter-only:",
+  "sup.perk_companion": "Companion window for a second monitor",
+  "sup.perk_liveskin": "Live-apply skins onto your dino + cloud presets",
+  "sup.perk_presets": "Unlimited local skins & presets",
+  "sup.perk_more": "Advanced session replay, sound cues, and later additions",
+  "sup.activate": "Activate",
+  "sup.checking": "Checking…",
+  "sup.recheck": "Check again",
+  "sup.remove": "Remove key",
+  "sup.active": "Active — thank you for supporting!",
+  "sup.grace":
+    "Couldn't re-verify with the server. Still working for a few more days — " +
+    "go online to refresh.",
+  "sup.get_key": "Get a supporter key →",
+  "sup.price_hint":
+    "Suggested support: 50,000₫ (lifetime, one-off). After supporting you'll " +
+    "get a key by email; paste it above and click Activate.",
+  "sup.locked_hint": "Supporter-only feature — see the Supporters section below.",
+  "sup.required_toast": "This is a supporter feature. Tap to open the Supporters section.",
+  "sup.err_unknown": "Unknown key. Double-check it for typos.",
+  "sup.err_revoked": "This key has been revoked.",
+  "sup.err_fp_limit":
+    "This key has moved between too many machines this month. Try next month " +
+    "or get in touch.",
+  "sup.err_bad": "Malformed key. It should look like BUMBUM-XXXX-XXXX-XXXX.",
+  "sup.err_network": "Couldn't reach the server. Check your connection and retry.",
 
   "telemetry.title": "Usage data & feedback",
   "telemetry.enabled": "Send anonymous usage data",

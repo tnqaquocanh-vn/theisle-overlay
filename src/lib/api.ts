@@ -820,6 +820,35 @@ export const dinoHistoryClear = () => invoke<void>("dino_history_clear");
 /** Fire a sample notification (the "Send test" button in alert settings). */
 export const alertsTest = () => invoke<void>("alerts_test");
 
+// ------------------------------------------------------- supporter license ---
+
+/** Local supporter status. `tier` is "free" | "supporter"; `grace` is true
+ *  while running on a stale-but-not-yet-expired cache. */
+export interface LicenseStatus {
+  tier: "free" | "supporter";
+  grace: boolean;
+  /** unix seconds of the last successful server validation (0 = never). */
+  checkedAt: number;
+  keyMasked: string | null;
+  /** Set when the last activate/refresh attempt failed. */
+  error: string | null;
+}
+
+/** Cached status only — no network. */
+export const licenseStatus = () => invoke<LicenseStatus>("license_status");
+/** Validate a pasted key against the server and, on success, store it. */
+export const licenseActivate = (key: string) =>
+  invoke<LicenseStatus>("license_activate", { key });
+/** Re-check the stored key against the server. */
+export const licenseRefresh = () => invoke<LicenseStatus>("license_refresh");
+/** Forget the stored key (drops to free immediately). */
+export const licenseClear = () => invoke<LicenseStatus>("license_clear");
+
+/** Rust rejected a supporter-gated action; `feature` is a short slug. */
+export const onSupporterRequired = (
+  cb: (feature: string) => void,
+): Promise<UnlistenFn> => listen<string>("license://required", (e) => cb(e.payload));
+
 export interface PartyMarker {
   label: string;
   xCm: number;

@@ -5,6 +5,7 @@ src-tauri/gen/schemas/
 *.log
 .wrangler/
 .dev.vars
+.admin.vars
 
 # Playwright visual-regression: keep tests/visual/__screenshots__ (the golden
 # baselines), drop the run artifacts.

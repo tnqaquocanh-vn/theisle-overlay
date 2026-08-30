@@ -20,12 +20,16 @@
     type SkinPreset,
   } from "$lib/api";
   import { t } from "$lib/i18n";
+  import { isSupporter } from "$lib/license.svelte";
   import {
     DINO_MODELS,
     DEFAULT_PALETTE,
     hasModel,
     type DinoPalette,
   } from "$lib/dino3d/registry";
+
+  // Free tier keeps a handful of local presets; supporters are uncapped.
+  const FREE_PRESET_CAP = 3;
   import DinoViewer3D from "$lib/dino3d/DinoViewer3D.svelte";
 
   const SPECIES = Object.keys(DINO_MODELS).sort();
@@ -291,7 +295,13 @@
     flashToast($t("skin.paste_bad"));
   }
 
+  const presetCapped = $derived(!isSupporter() && presets.length >= FREE_PRESET_CAP);
+
   function savePreset() {
+    if (presetCapped) {
+      flashToast($t("skin.preset_cap", { n: FREE_PRESET_CAP }));
+      return;
+    }
     const name = presetName.trim() || $t("skin.title");
     const id = "sk_" + Math.random().toString(36).slice(2, 10);
     const now = new Date().toISOString();
@@ -506,11 +516,14 @@
         bind:value={presetName}
         onkeydown={(e) => e.key === "Enter" && savePreset()}
       />
-      <button class="btn" onclick={savePreset}>{$t("skin.save")}</button>
+      <button class="btn" onclick={savePreset} disabled={presetCapped}>{$t("skin.save")}</button>
       {#if loggedIn}
         <button class="btn" onclick={() => void saveCloudPreset()}>☁ {$t("skin.save_cloud")}</button>
       {/if}
     </div>
+    {#if presetCapped}
+      <p class="empty">★ {$t("skin.preset_cap_hint", { n: FREE_PRESET_CAP })}</p>
+    {/if}
     {#if presets.length > 0}
       <div class="chips">
         {#each presets as p (p.id)}
@@ -659,6 +672,14 @@
   .btn:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
+  }
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+  .btn:disabled:hover {
+    border-color: var(--color-border);
+    color: var(--color-text);
   }
   .btn.primary {
     border-color: var(--color-accent);

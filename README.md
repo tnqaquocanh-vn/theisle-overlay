@@ -2,15 +2,19 @@
 
 **Tiếng Việt** · [English](README.en.md)
 
-Bản đồ hiện đè lên màn hình khi chơi **The Isle: Evrima** (map Gateway).
+Overlay bản đồ cho **The Isle: Evrima** (map Gateway) — **do BumBum phát triển**.
+Đây là bản viết lại toàn diện: lõi Rust + Tauri gọn nhẹ, thêm nhiều tính năng
+riêng không có ở bản gốc.
+
 Minimap tròn bám theo cửa sổ game · bản đồ lớn với POI, tên địa danh, waypoint,
-vết đường đi · chỉ số khủng long + Garage (Gacha) với **xem 3D** từ hệ thống
-IslePilot, đăng nhập Steam **một lần dùng cho mọi server** · giao diện song ngữ
-Việt/Anh · cài một lần, tự cập nhật.
+vết đường đi · **xem lại hành trình** (session replay) có thanh tua · **màn hình
+phụ** (companion) cho monitor thứ hai · chỉ số khủng long + Garage (Gacha) với
+**xem 3D** và **giết khủng long** từ hệ thống IslePilot · **trình chỉnh skin**
+có xem trước 3D và xuất mã dán thẳng vào game · đăng nhập Steam **một lần dùng
+cho mọi server** · giao diện song ngữ Việt/Anh · cài một lần, tự cập nhật.
 
-▶️ **Video hướng dẫn cài đặt & sử dụng:**
-
-[![Video hướng dẫn TheIsle Overlay](https://img.youtube.com/vi/R2IzwqHapuw/hqdefault.jpg)](https://y2u.be/R2IzwqHapuw)
+<!-- TODO(BumBum): quay video hướng dẫn cài đặt & sử dụng của riêng bạn rồi
+     chèn link vào đây. Video của tác giả cũ đã được gỡ. -->
 
 ![Minimap và chỉ số khủng long đè lên game](docs/screenshot-ingame.jpg)
 
@@ -43,8 +47,15 @@ Việt/Anh · cài một lần, tự cập nhật.
   thanh chỉ số + bảng nhiệm vụ Prime gọn ngay dưới minimap. Đăng nhập Steam
   **một lần dùng cho mọi server IslePilot** — đổi server là dữ liệu tự đổi theo.
 - **Garage (Gacha) với xem 3D**: mỗi dino đã park là một card có **model 3D
-  xoay/phóng được, đúng màu skin** + growth + nút Park/Restore/Đổi tên/Bán;
-  model tải một lần rồi cache, mở lại tức thì và offline được.
+  xoay/phóng được, đúng màu skin** + growth + nút Park/Restore/Đổi tên/Bán/
+  **Giết**; model tải một lần rồi cache, mở lại tức thì và offline được.
+- **Trình chỉnh skin**: 10 kênh màu + hoa văn, xem trước trên model 3D theo
+  thời gian thực, lưu preset, xuất **mã skin dán thẳng vào game**, và (người
+  ủng hộ) *áp dụng trực tiếp* lên dino đang chơi qua IslePilot.
+- **Xem lại hành trình**: tua lại vị trí + chỉ số theo thời gian, xuất đường đi
+  ra file `.geojson` chia sẻ được.
+- **Màn hình phụ (companion)**: cửa sổ dashboard riêng cho monitor thứ hai —
+  chỉ số, bản đồ, đội nhóm, nhiệm vụ; nhớ vị trí/kích thước, có chế độ thu gọn.
 - **Phím tắt toàn cục** đổi được trong app, song ngữ Việt/Anh, tự cập nhật phiên bản mới.
 
 ## Cài đặt
@@ -215,6 +226,10 @@ cá nhân trên máy bạn, không phải bản phát hành lại.
   của wiredredman.
 
 Không liên kết với Afterthought LLC.
+
+Giấy phép: **MIT** — xem [`LICENSE`](LICENSE). App này là bản phái sinh; danh
+sách đầy đủ các thành phần mã nguồn mở và ghi công bản quyền nằm ở
+[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
 
 ## Liên hệ & Ủng hộ
 

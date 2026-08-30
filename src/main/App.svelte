@@ -11,6 +11,7 @@
     onFullmapShow,
     onHotkeyFailed,
     onSettingsChanged,
+    onSupporterRequired,
     onTeamMark,
     onTeamWaypoint,
     simulatePosition,
@@ -21,6 +22,7 @@
   } from "$lib/api";
   import { locale, t, type Locale } from "$lib/i18n";
   import { updater, checkForUpdate, installUpdate, dismissUpdate } from "$lib/updater.svelte";
+  import { loadLicense } from "$lib/license.svelte";
   import FullMap from "./fullmap/FullMap.svelte";
   import Footer from "./Footer.svelte";
   import NavRail from "./NavRail.svelte";
@@ -123,6 +125,15 @@
     clearTimeout(teamToastTimer);
     teamToastTimer = setTimeout(() => (teamToast = null), 6000);
   }
+  // A supporter-gated action was blocked in Rust (companion / big map). A soft
+  // nudge, not an error — the free core is never touched.
+  let supporterToast = $state<string | null>(null);
+  let supporterToastTimer: ReturnType<typeof setTimeout> | undefined;
+  function showSupporterToast(text: string) {
+    supporterToast = text;
+    clearTimeout(supporterToastTimer);
+    supporterToastTimer = setTimeout(() => (supporterToast = null), 7000);
+  }
   // Remount FullMap when the basemap changes ({#key} below): the imageOverlay
   // bounds and every layer's px change together, so a rebuild IS the correct
   // "in-place" update. Seeded before ready=true — no spurious first remount.
@@ -182,6 +193,12 @@
       );
       // Full-map hotkey mid-game: land on the map, not the last-open tab.
       await bag.add(onFullmapShow(() => (tab = "map")));
+      // Supporter status for the UI gates (Rust keeps its own flag). Fire and
+      // forget — a failure just leaves everyone on the free tier.
+      void loadLicense();
+      await bag.add(
+        onSupporterRequired(() => showSupporterToast($t("sup.required_toast"))),
+      );
       // One silent check on startup — surfaces the green banner only if a
       // newer signed release exists; failures/no-op stay quiet.
       if (settings.updates?.auto_check ?? true) void checkForUpdate(true);
@@ -230,6 +247,19 @@
         >
           ⚠ {teamToast}
         </div>
+      {/if}
+
+      {#if supporterToast}
+        <button
+          class="flex shrink-0 cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm"
+          style="background: var(--color-bg-elev, #23202b); color: var(--color-accent)"
+          onclick={() => {
+            tab = "settings";
+            supporterToast = null;
+          }}
+        >
+          ★ {supporterToast}
+        </button>
       {/if}
 
       {#if failedHotkeys.length > 0}

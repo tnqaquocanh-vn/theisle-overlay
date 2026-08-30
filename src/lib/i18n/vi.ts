@@ -54,6 +54,9 @@ export const vi = {
   "skin.cloud_presets": "Preset trên IslePilot",
   "skin.cloud_saved": "Đã lưu lên IslePilot",
   "skin.cloud_err": "Lỗi IslePilot: {err}",
+  "skin.preset_cap": "Bản miễn phí lưu tối đa {n} skin. Trở thành người ủng hộ để lưu không giới hạn.",
+  "skin.preset_cap_hint":
+    "Đã đạt giới hạn {n} skin của bản miễn phí — xoá bớt một skin, hoặc mở khoá không giới hạn ở mục Người ủng hộ (Cài đặt).",
 
   // --- trạng thái vị trí ---
   "pos.none": "Chưa có vị trí",
@@ -580,6 +583,39 @@ export const vi = {
   "update.auto_check_hint":
     "Chỉ tải một file thông tin phiên bản (latest.json) từ trang phát hành. " +
     "Không tự tải hay tự cài — luôn hỏi trước khi cập nhật.",
+
+  // --- người ủng hộ (license) ---
+  "sup.title": "Người ủng hộ",
+  "sup.badge": "Người ủng hộ",
+  "sup.pitch":
+    "Toàn bộ tính năng cốt lõi (bản đồ, minimap, waypoint, đường đi, chỉ số " +
+    "khủng long, Garage, trình chỉnh skin cơ bản) luôn miễn phí. Một vài tiện " +
+    "ích nâng cao dành cho người ủng hộ:",
+  "sup.perk_companion": "Cửa sổ bảng phụ cho màn hình thứ hai",
+  "sup.perk_liveskin": "Áp skin trực tiếp lên khủng long + preset trên đám mây",
+  "sup.perk_presets": "Lưu không giới hạn skin & preset ở máy",
+  "sup.perk_more": "Xem lại hành trình nâng cao, âm thanh cảnh báo, và các bổ sung sau này",
+  "sup.activate": "Kích hoạt",
+  "sup.checking": "Đang kiểm tra…",
+  "sup.recheck": "Kiểm tra lại",
+  "sup.remove": "Gỡ mã",
+  "sup.active": "Đã kích hoạt — cảm ơn bạn đã ủng hộ!",
+  "sup.grace":
+    "Chưa xác thực lại được với máy chủ. Vẫn dùng bình thường thêm vài ngày — " +
+    "hãy nối mạng để làm mới.",
+  "sup.get_key": "Lấy mã ủng hộ →",
+  "sup.price_hint":
+    "Mức ủng hộ: 50.000đ (trọn đời, một lần). Sau khi ủng hộ bạn sẽ nhận mã " +
+    "qua email; dán mã vào ô trên rồi bấm Kích hoạt.",
+  "sup.locked_hint": "Tính năng dành cho người ủng hộ — xem mục Người ủng hộ bên dưới.",
+  "sup.required_toast": "Tính năng này dành cho người ủng hộ. Bấm để mở phần Người ủng hộ.",
+  "sup.err_unknown": "Mã không tồn tại. Kiểm tra lại xem có gõ sai không.",
+  "sup.err_revoked": "Mã này đã bị thu hồi.",
+  "sup.err_fp_limit":
+    "Mã đã dùng trên quá nhiều máy trong tháng này. Thử lại vào tháng sau, " +
+    "hoặc liên hệ để được hỗ trợ.",
+  "sup.err_bad": "Mã sai định dạng. Dạng đúng: BUMBUM-XXXX-XXXX-XXXX.",
+  "sup.err_network": "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.",
 
   // --- số liệu sử dụng & phản hồi ---
   "telemetry.title": "Số liệu sử dụng & phản hồi",

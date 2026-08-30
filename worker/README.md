@@ -60,6 +60,42 @@ Lệch nhau là mọi request bị 401, im lặng.
 Cuối cùng: cập nhật `API_BASES` trong `src-tauri/src/telemetry/client.rs` thành
 URL workers.dev thật.
 
+## Mã người ủng hộ (license) — v1.31
+
+Bảng `license` + route `/v1/license/*` và `/admin/license/*` (`src/license.ts`).
+Ghi rất ít (chỉ khi mint / đổi máy / revoke) nên nằm chung D1 `isle`.
+
+```bash
+# 1. Áp migration (đã gộp vào db:remote)
+npx wrangler d1 execute isle --remote --file=migrations/0002_licenses.sql
+
+# 2. Secret cho webhook Ko-fi (ADMIN_TOKEN dùng lại từ phần telemetry)
+npx wrangler secret put KOFI_VERIFICATION_TOKEN   # Ko-fi → Settings → API → Verification Token
+# (tuỳ chọn) mức tối thiểu tính bằng tiền tệ người bán, mặc định 1.5:
+#   thêm "KOFI_MIN": "2" vào "vars" trong wrangler.jsonc
+
+npx wrangler deploy
+```
+
+**Webhook Ko-fi:** Ko-fi → *Settings → API* → *Webhook URL* =
+`https://<worker>/v1/license/kofi`. Mỗi lần donate đạt `KOFI_MIN` sẽ mint một
+key `source='kofi'` gắn email người donate; bạn tự gửi key cho họ.
+
+**CLI quản trị** (`scripts/license-admin.mjs`, đọc `./.admin.vars`):
+
+```bash
+cp .admin.vars.example .admin.vars      # điền ADMIN_BASE + ADMIN_TOKEN
+npm run license -- mint --count 3 --note "ban be"   # cấp tay
+npm run license -- pending              # key Ko-fi đã mint, chưa gửi
+npm run license -- sent BUMBUM-XXXX-XXXX-XXXX        # đánh dấu đã gửi
+npm run license -- revoke BUMBUM-XXXX-XXXX-XXXX      # thu hồi
+npm run license -- list                 # toàn bộ
+```
+
+App gọi `POST /v1/license/validate {key, fp, appVersion}` → `{valid, tier}`.
+Vân tay máy (`fp`) là env-based, cho đổi máy 2 lần/tháng. App cache kết quả có
+ký HMAC 14 ngày (+3 ngày ân hạn) nên server sập vài giờ không ai bị khoá.
+
 ## Phát triển cục bộ
 
 ```bash

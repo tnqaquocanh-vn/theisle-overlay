@@ -1,0 +1,4 @@
+# Copy to .admin.vars (gitignored) so `npm run license -- <cmd>` knows where to
+# call and with what token. Never commit the real file.
+ADMIN_BASE=https://theisle-overlay-api.quocanh.workers.dev
+ADMIN_TOKEN=paste-the-same-value-you-set-with-wrangler-secret-put-ADMIN_TOKEN
