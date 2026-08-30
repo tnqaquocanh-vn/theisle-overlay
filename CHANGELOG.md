@@ -2,29 +2,44 @@
 
 Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây, theo định dạng
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
-[SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
+[SemVer](https://semver.org/lang/vi/).
+
+Nội dung mỗi phiên bản là **thông báo ngắn gọn cho người dùng** (tính năng mới,
+sửa lỗi) — không đi vào chi tiết kỹ thuật, không nêu tên file/hàm. Đây cũng là
+nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật nằm ở commit
+message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
+tự cắt phần đó khỏi thông báo người dùng thấy.
+
+## [1.37.0] — 2026-08-31
+
+### Sửa
+
+- **Trình chỉnh skin bị "nhảy về đen".** Khi đang đăng nhập IslePilot, skin
+  trong game cứ ~1 giây lại ghi đè màu bạn vừa chỉnh khiến không sửa được gì.
+  Giờ trình chỉnh mặc định không bị game can thiệp; muốn skin đổi theo thời
+  gian thực thì bật ô **"☁ Áp trực tiếp vào game khi chỉnh màu"** (lựa chọn
+  này được nhớ). Tắt thì dùng nút **Áp dụng vào game** như cũ.
+
+### Đổi
+
+- **Mở app nhanh hơn.** Các tab nặng (bản đồ, khủng long, garage, skin) chỉ
+  nạp khi bạn mở lần đầu, nên cửa sổ chính hiện lên nhẹ hơn hẳn.
+- **Thẻ Người ủng hộ rõ hơn.** Khi đang chạy offline sẽ hiện "còn N ngày ân
+  hạn"; nút Kiểm tra lại nổi bật hơn và có cả ở bản dùng thử; báo rõ lý do khi
+  kích hoạt/kiểm tra thất bại.
+- **"Đã mua trên máy này nhưng mất mã?"** — link mới ở thẻ Người ủng hộ: cài
+  lại Windows xong bấm là lấy lại mã đã mua trên máy đó (không cần liên hệ).
+- Tạm ẩn tiếng Bồ Đào Nha khỏi danh sách ngôn ngữ (mới dịch 9%, để lại tiếng
+  Anh cho đến khi hoàn thiện).
 
 ## [1.36.2] — 2026-08-30
 
 ### Đổi
 
-- **Áp skin vào game giờ là bấm nút, không còn tự động.** Trong trình chỉnh
-  skin, chọn màu xong bấm **"☁ Áp dụng vào game"** để đẩy màu vào game qua
-  IslePilot. Bỏ ô "áp trực tiếp" cũ — kéo màu không còn spam socket / giật
-  game. Bản xem trước 3D ở trình chỉnh vẫn cập nhật tức thì như trước.
-- Nút cho biết trạng thái: **"☁ Áp dụng vào game"** khi có thay đổi chưa đẩy,
-  **"✓ Áp dụng lại"** khi đã khớp với game (bấm lại để đẩy lại, ví dụ sau khi
-  khủng long hồi sinh). Có báo lại: *"Đã áp dụng vào game"* khi thành công, hoặc
-  *"IslePilot chưa kết nối — sẽ tự áp khi vào lại"* nếu socket đang rớt. Nút có
-  khoá ~1 giây để bấm dồn không spam được.
-- Nạp preset (máy hoặc cloud) chỉ đổ màu vào trình chỉnh — không tự vào game;
-  bấm nút mới đẩy.
-
-### Kỹ thuật
-
-- IslePilot realtime (`realtime.rs`) theo dõi trạng thái kết nối; lệnh
-  `islepilot_send_liveskin` trả về `true/false` để app biết frame đã đi ngay hay
-  đang xếp hàng chờ kết nối lại.
+- **Áp skin vào game giờ bấm nút, không còn tự động.** Trong trình chỉnh skin,
+  chọn màu xong bấm **"Áp dụng vào game"**. Kéo màu không còn làm game giật;
+  bản xem trước trong app vẫn hiện ngay.
+- Nút báo rõ đã áp dụng hay chưa, và báo khi chưa kết nối được IslePilot.
 
 ## [1.36.1] — 2026-08-30
 
