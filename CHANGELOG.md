@@ -4,6 +4,76 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.35.0] — 2026-08-30
+
+### Thêm
+
+- **Dùng thử 3 ngày miễn phí.** Người mới bấm một nút ở **Cài đặt → Người ủng
+  hộ** là mở khoá toàn bộ tính năng nâng cao trong 3 ngày, không cần trả tiền,
+  không cần nhập gì. Hết hạn tự về bản miễn phí. **Một lần / máy** (máy chủ khoá
+  theo vân tay máy + trần theo IP mỗi ngày). Hiện đếm ngược "còn N ngày".
+
+### Đổi
+
+- **Nhóm sinh tồn (G6)** chuyển sang tính năng người ủng hộ. Nút Tạo/Vào nhóm bị
+  khoá kèm dấu ★ khi chưa có mã; ai đang trong nhóm vẫn xem/rời được.
+- **Mức ủng hộ gợi ý: 30.000đ** (chuỗi hiển thị; giá thật lấy từ biến
+  `PRICE_VND` của Worker — nhớ đặt `PRICE_VND=30000`).
+
+### Chống gian lận / sao chép
+
+- **Vân tay máy mạnh hơn:** thêm `MachineGuid` của Windows (giữ nguyên khi đổi
+  tên PC/tài khoản; chỉ đổi khi cài lại Windows / khôi phục ảnh đĩa).
+- **Cache license gắn với máy:** chữ ký HMAC giờ phủ cả vân tay máy + mốc thời
+  gian ghi. Chép `license.json` sang máy khác → cache bị từ chối → buộc kiểm tra
+  online (dính giới hạn đổi máy của máy chủ).
+- **Chống lùi đồng hồ:** nếu đồng hồ hệ thống bị chỉnh lùi nhiều so với lần ghi
+  cache gần nhất → cache bị nghi ngờ, buộc kiểm tra lại (chặn mẹo "lùi giờ để
+  giữ trial/ân hạn").
+- **Phát hiện chia sẻ mã:** khi bật telemetry, mỗi ping gửi kèm *hash ngắn* của
+  mã đang dùng + vân tay máy. Cron ban đêm tự **thu hồi** mã bị thấy trên >4 máy
+  trong 10 ngày. Chưa bật telemetry thì phần này nằm im.
+- **Rate-limit** `/v1/license/validate` + `/trial` theo IP (15 lần/phút) — chặn
+  dò mã / spam trial.
+- **Chống trial trên máy ảo:** app nhận diện VMware/VirtualBox/Hyper-V/QEMU qua
+  SMBIOS; máy chủ từ chối cấp trial (không lộ lý do).
+- **Trial chỉ mở sau 3 lần chạy app** — cài-bấm-gỡ không tiện.
+- **Làm rối bundle JS** (đổi tên định danh, nén) cho code riêng của app trong
+  bản release — lớp phụ, gate thật vẫn ở Rust. Thư viện 3D/bản đồ không đụng tới.
+- **Điều khoản sử dụng** (`EULA.txt`) hiện trong trình cài đặt: cấm bán lại mã,
+  đóng gói lại, vô hiệu hoá kiểm tra bản quyền.
+- Trial: một mã `TRIAL-…` riêng, hết hạn cứng 3 ngày, leash offline ngắn (tin
+  2 ngày + 3 ngày ân hạn).
+
+### Kỹ thuật
+
+- Rust `license.rs`: `Cache` += `until`/`fp`/`seen_ms`; `machine_guid()` (đọc
+  registry, có sẵn ở `telemetry/mod.rs` pattern); `start_trial()`; `status()`
+  xử lý trial + hết hạn. Lệnh `license_trial`. Gate `team_create`/`team_join`.
+- Worker: `0004_trial.sql` (`license_expiry`, `trial_ip`); `POST /v1/license/
+  trial` (một lần/vân tay + trần {TRIAL_IP_MAX}/IP/ngày); `validate` trả `until`
+  và từ chối `expired`.
+- Frontend: `isSupporter()` = supporter **hoặc** trial; `trialDaysLeft()`;
+  `SupporterCard` nút dùng thử + đếm ngược; `DinoTab` khoá nhóm; i18n `sup.trial_*`.
+- Worker `0005_abuse.sql` (`license_lk`, `license_seen`); `RL_LICENSE` binding;
+  `recordLk` sau mọi lượt mint; `ping.ts` ghi `license_seen`; `cron.ts` tự thu
+  hồi mã dùng chung. Rust `active_key_hash()` + `looks_like_vm()` + đếm lượt
+  chạy `settings.meta.runs` (bump `recursion_limit` do json! macro).
+  `vite-plugin-javascript-obfuscator` (chỉ `build`, chỉ code app).
+  `bundle.licenseFile` = `EULA.txt`.
+
+## [1.34.0] — 2026-08-30
+
+### Đổi
+
+- **Tách kho mã nguồn.** Mã nguồn + CI chuyển sang repo **riêng tư** của BumBum.
+  Repo `github.com/tnqaquocanh-vn/theisle-overlay` giữ **public** làm *trang
+  phát hành*: chỉ còn README / LICENSE / THIRD-PARTY-NOTICES / CHANGELOG + các
+  bản cài. URL auto-update **không đổi** — người dùng cũ cập nhật bình thường.
+- CI ở repo riêng build rồi đẩy bản cài + `latest.json` sang repo public (qua
+  token `RELEASE_PAT`), đồng thời đồng bộ CHANGELOG.
+- Không thay đổi gì trong ứng dụng — bản này chỉ để xác nhận đường phát hành mới.
+
 ## [1.33.1] — 2026-08-30
 
 ### Đổi
