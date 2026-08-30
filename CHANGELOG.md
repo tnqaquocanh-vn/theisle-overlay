@@ -10,6 +10,15 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.37.2] — 2026-08-31
+
+### Thêm
+
+- **🧪 Minimap tiết kiệm CPU (Cài đặt → Bản đồ nhỏ).** Cách vẽ bản đồ mới giúp
+  di chuyển mượt hơn nhiều trên máy CPU yếu, không dùng thêm GPU. Đang thử
+  nghiệm nên mặc định TẮT; bật lên nếu overlay làm máy giật khi chạy cạnh game.
+  Tắt thì hình ảnh y như cũ.
+
 ## [1.37.1] — 2026-08-31
 
 ### Thêm
