@@ -29,6 +29,8 @@
   import DinoViewer3D from "$lib/dino3d/DinoViewer3D.svelte";
 
   const SPECIES = Object.keys(DINO_MODELS).sort();
+  const patternCountOf = (sp: string) =>
+    Object.keys(DINO_MODELS[sp]?.patterns ?? { 1: 1 }).filter((k) => /^\d+$/.test(k)).length || 1;
   // Order + labels match the official overlay's channel list.
   const CHANNELS: { key: keyof DinoPalette; label: string }[] = [
     { key: "body", label: "skin.ch_body" },
@@ -100,6 +102,7 @@
   let patternIdx = $state(1);
   let variationIdx = $state(0);
   let themeIdx = $state(0);
+  const patternCount = $derived(patternCountOf(species));
   // The game code's 5 colours, in its order.
   const GAME_ORDER: (keyof DinoPalette)[] = [
     "underbelly",
@@ -426,11 +429,13 @@
 
       {#key species}
         <div class="stage">
-          <DinoViewer3D {species} palette={livePalette} height={340} />
+          <DinoViewer3D {species} palette={livePalette} pattern={patternIdx} height={340} />
         </div>
       {/key}
       {#if !hasModel(species)}
         <p class="nomodel">{$t("skin.no_model")}</p>
+      {:else if patternIdx > patternCount}
+        <p class="nomodel">{$t("skin.pattern_nopreview", { n: patternCount })}</p>
       {/if}
 
       <label class="species pat">

@@ -40,6 +40,7 @@ export const vi = {
   "skin.copied_app": "Đã chép mã app (chia sẻ giữa người dùng overlay)",
   "skin.paste_bad": "Clipboard không có mã skin hợp lệ",
   "skin.pattern": "Pattern",
+  "skin.pattern_nopreview": "Pattern này chưa có ảnh xem trước (chỉ có {n}) — mã game vẫn xuất đúng số.",
   "skin.hex_bad": "Mã hex không hợp lệ",
   "skin.your_skins": "Skin của bạn",
   "skin.preset_name": "Tên skin",

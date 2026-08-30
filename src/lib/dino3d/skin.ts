@@ -219,19 +219,37 @@ export interface SkinCanvases {
 const skinCache = new Map<string, Promise<SkinCanvases>>();
 const SKIN_CACHE_MAX = 12;
 
-/** Stable cache key for a species + palette combination. */
-export const skinKey = (species: string, palette: DinoPalette): string =>
-  `${species}|${Object.values(palette).join(",")}`;
+/** Stable cache key for a species + palette + pattern combination. */
+export const skinKey = (
+  species: string,
+  palette: DinoPalette,
+  pattern: string = "1",
+): string => `${species}|${pattern}|${Object.values(palette).join(",")}`;
 
-/** Build the recoloured skin for one species + palette (pattern index 1). */
+/** The pattern PNG (+ TMC mask) for `pattern`, falling back to "1" then the
+ *  first available — species only have CDN previews for a few of the game's
+ *  eight pattern slots. */
+export function patternUrls(
+  entry: DinoModelEntry,
+  pattern: string,
+): { patternUrl: string; tmcUrl: string | null } {
+  const patternUrl =
+    entry.patterns[pattern] ?? entry.patterns["1"] ?? Object.values(entry.patterns)[0];
+  const tmcUrl =
+    entry.patternMasks?.[pattern] ?? entry.patternMasks?.["1"] ?? null;
+  return { patternUrl, tmcUrl };
+}
+
+/** Build the recoloured skin for one species + palette + pattern. */
 export function buildSkin(
   entry: DinoModelEntry,
   palette: DinoPalette,
+  pattern: string = "1",
 ): Promise<SkinCanvases> {
-  const key = skinKey(entry.name, palette);
+  const key = skinKey(entry.name, palette, pattern);
   let p = skinCache.get(key);
   if (!p) {
-    p = buildSkinUncached(entry, palette);
+    p = buildSkinUncached(entry, palette, pattern);
     p.catch(() => skinCache.delete(key));
     if (skinCache.size >= SKIN_CACHE_MAX) {
       const oldest = skinCache.keys().next().value;
@@ -245,9 +263,9 @@ export function buildSkin(
 async function buildSkinUncached(
   entry: DinoModelEntry,
   palette: DinoPalette,
+  patternIdx: string,
 ): Promise<SkinCanvases> {
-  const patternUrl = entry.patterns["1"] ?? Object.values(entry.patterns)[0];
-  const tmcUrl = entry.patternMasks?.["1"] ?? null;
+  const { patternUrl, tmcUrl } = patternUrls(entry, patternIdx);
   const [pattern, tmc, rac, normal, detailNormal] = await Promise.all([
     loadImageData(patternUrl),
     tmcUrl ? loadImageData(tmcUrl).catch(() => null) : Promise.resolve(null),

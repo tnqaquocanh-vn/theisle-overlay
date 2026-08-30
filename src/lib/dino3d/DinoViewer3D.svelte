@@ -14,19 +14,24 @@
   import { t } from "$lib/i18n";
   import { listenerBag, onCdnProgress } from "$lib/api";
   import { DINO_MODELS, DEFAULT_PALETTE, SHARED, type DinoPalette } from "./registry";
-  import { buildSkin, skinKey } from "./skin";
+  import { buildSkin, patternUrls, skinKey } from "./skin";
   import { loadGltf } from "./model-cache";
   import bgImage from "../../assets/dino-viewer-bg.jpg";
 
   let {
     species,
     palette = null,
+    pattern = 1,
     height = 300,
   }: {
     species: string;
     palette?: DinoPalette | null;
+    /** Pattern slot (1-8); species only have previews for a few. */
+    pattern?: number | string;
     height?: number;
   } = $props();
+
+  const patStr = (): string => String(pattern ?? 1);
 
   let container: HTMLDivElement | undefined = $state();
   let status = $state<"loading" | "ready" | "no-model" | "error">("loading");
@@ -96,7 +101,7 @@
     if (!l) return;
     const gen = generation; // a species change bumps this and aborts us
     const seq = ++recolorSeq; // a newer recolor supersedes this one
-    const skin = await buildSkin(l.entry, pal);
+    const skin = await buildSkin(l.entry, pal, patStr());
     if (gen !== generation || live !== l || seq !== recolorSeq) return;
     const { THREE } = l;
     const nextMap = new THREE.CanvasTexture(skin.map);
@@ -132,11 +137,12 @@
     status = "loading";
     perUrl.clear();
     progressText = "";
+    const pu = patternUrls(entry, patStr());
     watchedUrls = new Set(
       [
         entry.glbModel,
-        entry.patterns["1"] ?? Object.values(entry.patterns)[0],
-        entry.patternMasks?.["1"],
+        pu.patternUrl,
+        pu.tmcUrl,
         entry.racMap,
         entry.normalMap,
         SHARED.detailNormal,
@@ -148,7 +154,7 @@
         import("three/examples/jsm/controls/OrbitControls.js"),
         import("three/examples/jsm/utils/SkeletonUtils.js"),
         loadGltf(entry),
-        buildSkin(entry, pal),
+        buildSkin(entry, pal, patStr()),
       ]);
       if (gen !== generation) return; // superseded while loading
 
@@ -306,13 +312,15 @@
     const el = container;
     const sp = species;
     const pal = palette ?? DEFAULT_PALETTE;
+    const pat = patStr();
     if (!el) return;
     // Rebuild guard: parent re-renders hand in NEW palette objects with the
     // SAME contents — only an actual content change rebuilds the scene.
-    const key = skinKey(sp, pal);
+    const key = skinKey(sp, pal, pat);
     if (key === builtKey) return;
     builtKey = key;
-    // Same species + a live scene → swap textures, keeping camera + animation.
+    // Same species + a live scene → swap textures (palette OR pattern change),
+    // keeping camera + animation.
     if (live && live.species === sp && status === "ready") {
       void recolor(pal);
     } else {

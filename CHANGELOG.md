@@ -4,6 +4,22 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.29.2] — 2026-08-30
+
+### Thêm
+
+- **Xem trước Pattern trong tab Skin.** Bộ chọn Pattern (thêm ở v1.29.1) giờ
+  đổi cả model 3D — dùng đúng ảnh pattern của loài. Loài có 3–5 pattern; chọn
+  quá số đó thì preview lùi về pattern 1 kèm ghi chú, nhưng **mã game vẫn xuất
+  đúng chỉ số pattern**.
+
+### Kỹ thuật
+
+- `skin.ts`: `buildSkin` / `skinKey` nhận thêm tham số `pattern`; hàm
+  `patternUrls(entry, pattern)` (lùi về "1" → pattern đầu tiên).
+  `DinoViewer3D` thêm prop `pattern` — đổi pattern đi qua đường `recolor()`
+  nhanh, giữ camera + animation.
+
 ## [1.29.1] — 2026-08-30
 
 ### Thêm

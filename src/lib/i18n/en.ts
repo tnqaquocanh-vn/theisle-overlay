@@ -38,6 +38,7 @@ export const en: Record<MsgKey, string> = {
   "skin.copied_app": "App code copied (share between overlay users)",
   "skin.paste_bad": "No valid skin code in the clipboard",
   "skin.pattern": "Pattern",
+  "skin.pattern_nopreview": "No preview image for this pattern (only {n}) — the game code still exports the right number.",
   "skin.hex_bad": "Not a valid hex colour",
   "skin.your_skins": "Your skins",
   "skin.preset_name": "Skin name",
