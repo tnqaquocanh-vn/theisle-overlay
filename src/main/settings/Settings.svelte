@@ -38,6 +38,11 @@
   let npcap = $state<NpcapStatus | null>(null);
   let presetName = $state("");
 
+  // Supporter gate for the Pro-only toggles below. Rust is authoritative (it
+  // clamps these settings for a free tier); this just disables the controls.
+  const sup = $derived(license.tier === "supporter");
+  const supLabel = (s: string) => (sup ? s : `★ ${s}`);
+
   onMount(() => {
     const bag = listenerBag();
     void getSettings().then((s) => (settings = s));
@@ -231,7 +236,7 @@
         {$t("settings.minimap")}
       </h2>
       <div class="space-y-3">
-        {#each [["visible", "settings.visible"], ["require_game", "settings.require_game"], ["click_through", "settings.click_through"], ["show_trail", "settings.show_trail"], ["show_waypoints", "settings.show_waypoints"], ["rotate_with_heading", "settings.rotate_minimap"], ["show_team_panel", "settings.show_team_panel"], ["last_seen_beacon", "settings.last_seen_beacon"], ["smooth_motion", "settings.smooth_motion"], ["solo_mode", "settings.solo_mode"], ["auto_preset", "settings.auto_preset"], ["diagnostics", "settings.minimap_diag"]] as [key, labelKey] (key)}
+        {#each [["visible", "settings.visible"], ["require_game", "settings.require_game"], ["click_through", "settings.click_through"], ["show_trail", "settings.show_trail"], ["show_waypoints", "settings.show_waypoints"], ["rotate_with_heading", "settings.rotate_minimap"], ["show_team_panel", "settings.show_team_panel"], ["last_seen_beacon", "settings.last_seen_beacon"], ["smooth_motion", "settings.smooth_motion"], ["solo_mode", "settings.solo_mode"]] as [key, labelKey] (key)}
           <Toggle
             label={$t(labelKey as never)}
             checked={Boolean((settings.minimap as never as Record<string, boolean>)[key])}
@@ -244,10 +249,26 @@
           checked={settings.minimap.mouse_gestures ?? false}
           onchange={(v) => void patch({ minimap: { mouse_gestures: v } })}
         />
+        <!-- Supporter-only: auto-preset, diagnostics readout, sound cues -->
         <Toggle
-          label={$t("settings.sound_cues")}
-          hint={$t("settings.sound_cues_hint")}
-          checked={(settings.sound as { enabled?: boolean } | undefined)?.enabled ?? false}
+          label={supLabel($t("settings.auto_preset"))}
+          hint={sup ? undefined : $t("sup.locked_hint")}
+          disabled={!sup}
+          checked={sup && Boolean(settings.minimap.auto_preset)}
+          onchange={(v) => void patch({ minimap: { auto_preset: v } })}
+        />
+        <Toggle
+          label={supLabel($t("settings.minimap_diag"))}
+          hint={sup ? undefined : $t("sup.locked_hint")}
+          disabled={!sup}
+          checked={sup && Boolean(settings.minimap.diagnostics)}
+          onchange={(v) => void patch({ minimap: { diagnostics: v } })}
+        />
+        <Toggle
+          label={supLabel($t("settings.sound_cues"))}
+          hint={sup ? $t("settings.sound_cues_hint") : $t("sup.locked_hint")}
+          disabled={!sup}
+          checked={sup && ((settings.sound as { enabled?: boolean } | undefined)?.enabled ?? false)}
           onchange={(v) => void patch({ sound: { enabled: v } })}
         />
 
@@ -481,15 +502,16 @@
       </h2>
       <div class="flex flex-wrap gap-2">
         {#each BASEMAPS as source (source)}
+          {@const locked = !sup && source !== "vulnona"}
           <button
             class="cursor-pointer rounded border px-3 py-1 text-sm disabled:opacity-50"
             style={settings.map.basemap === source
               ? "background: var(--color-accent); color: var(--color-bg); border-color: var(--color-accent); font-weight: 600"
               : "border-color: var(--color-border)"}
-            disabled={basemapBusy !== null}
+            disabled={basemapBusy !== null || locked}
             onclick={() => void chooseBasemap(source)}
           >
-            {basemapBusy === source
+            {locked ? "★ " : ""}{basemapBusy === source
               ? $t("basemap.downloading")
               : $t(`basemap.${source}` as never)}
           </button>
@@ -497,6 +519,9 @@
       </div>
       {#if basemapError}
         <p class="mt-2 text-xs" style="color: #ff8a80">{$t("basemap.failed")}</p>
+      {/if}
+      {#if !sup}
+        <p class="mt-2 text-xs" style="color: var(--color-muted)">★ {$t("sup.locked_hint")}</p>
       {/if}
       <p class="mt-2 text-xs leading-relaxed" style="color: var(--color-muted)">
         {$t("basemap.hint")}

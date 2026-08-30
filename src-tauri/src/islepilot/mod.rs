@@ -491,7 +491,7 @@ fn maybe_auto_preset(app: &AppHandle, species: &str) {
         }
         *last = species.to_string();
     }
-    let on = {
+    let on = crate::license::is_supporter() && {
         let state = app.state::<AppState>();
         let s = state.settings.lock_safe();
         settings::get_bool(&s, &["minimap", "auto_preset"], false)

@@ -61,6 +61,10 @@ export type Settings = Record<string, unknown> & {
     last_seen_beacon: boolean;
     /** P1: ease the marker between samples instead of teleporting. */
     smooth_motion: boolean;
+    /** A4: auto-apply the preset named after your species on a swap (supporter). */
+    auto_preset?: boolean;
+    /** v1.26: render-ms / repaint-rate readout on the disc (supporter). */
+    diagnostics?: boolean;
   };
   /** G1: automatic own-position from passive UDP capture (opt-in, default off). */
   localpos: { enabled: boolean };

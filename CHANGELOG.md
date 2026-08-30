@@ -4,6 +4,41 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.33.0] — 2026-08-30
+
+### Đổi
+
+- **Hoàn tất giới hạn bản miễn phí ↔ người ủng hộ (§02).** Toàn bộ phần lõi vẫn
+  miễn phí (bản đồ, minimap, waypoint, đường đi, chỉ số khủng long, Garage, chỉnh
+  skin cục bộ + xuất mã game, xem lại hành trình cơ bản). Các tính năng nâng cao
+  giờ cần mã người ủng hộ:
+  - **Cửa sổ Bảng phụ** (companion) — đã khoá từ v1.31.
+  - **Bản đồ lớn trong game** (Ctrl+Alt+G) — phím tắt hiện thông báo nhẹ thay
+    vì mở.
+  - **Nền bản đồ IsleMaps** (sáng/tối) — nút bị khoá, Vulnona vẫn miễn phí.
+  - **Lớp chỉ số khi xem lại hành trình** + **xuất `.geojson`** — thanh tua vẫn
+    miễn phí.
+  - **Tự áp preset theo loài** khi đổi khủng long.
+  - **Âm thanh cảnh báo** HUD.
+  - **Bảng chẩn đoán** minimap (render-ms / fps).
+  - **Skin**: áp trực tiếp lên khủng long + preset đám mây (chỉnh + xuất mã game
+    vẫn miễn phí; bản free lưu tối đa 3 preset cục bộ — từ v1.31).
+- Nút / ô cài đặt của các mục trên hiện dấu **★** và bị mờ khi chưa có mã; bấm
+  vào phần bị khoá sẽ nhắc mở mục **Cài đặt → Người ủng hộ**.
+
+### Kỹ thuật
+
+- Rust là "nguồn sự thật": `commands::clamp_supporter_settings` ép
+  `minimap.diagnostics` / `minimap.auto_preset` / `sound.enabled` về false và
+  nền IsleMaps về `vulnona` cho mọi cửa sổ (bản lưu trên đĩa giữ nguyên lựa
+  chọn — hồi lại khi gia hạn). Gate ở `bigmap::toggle`,
+  `set_basemap_source`, `export_trail_geojson`, `get_trail_stats`,
+  `islepilot_send_liveskin`, `islepilot_skin_preset`,
+  `islepilot::maybe_auto_preset`. `license_activate/refresh/clear` phát lại
+  `settings://changed` để mọi cửa sổ áp lại clamp ngay.
+- Frontend: badge ★ + trạng thái mờ ở `Settings.svelte`, `SkinEditor.svelte`;
+  `FullMap.svelte` bắt lỗi `supporter_required` khi xuất `.geojson`.
+
 ## [1.32.0] — 2026-08-30
 
 ### Thêm

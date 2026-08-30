@@ -82,7 +82,14 @@ pub fn create(app: &AppHandle) -> tauri::Result<()> {
 
 /// Ctrl+Alt+G, and the header ✕ (which calls `toggle_bigmap`). Only flips the
 /// intent — the supervisor does the actual show/hide within one tick.
-pub fn toggle(_app: &AppHandle) {
+pub fn toggle(app: &AppHandle) {
+    // Supporter-gated (v1.33). A non-supporter can never open it, so there is
+    // nothing to hide — just nudge them to the Settings card.
+    if !WANTED.load(Ordering::SeqCst) && !crate::license::is_supporter() {
+        let _ = app.emit("license://required", "bigmap");
+        log::info!("bigmap: blocked — supporter only");
+        return;
+    }
     let now = WANTED.fetch_xor(true, Ordering::SeqCst);
     log::info!("bigmap: {}", if now { "close" } else { "open" });
 }

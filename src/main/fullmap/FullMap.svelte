@@ -439,7 +439,12 @@
       const n = await exportTrailGeojson(path, replayName);
       void message($t("replay.exported", { n }), { kind: "info" });
     } catch (e) {
-      void message($t("replay.export_failed", { err: String(e) }), { kind: "error" });
+      const err = String(e);
+      if (err.includes("supporter_required")) {
+        void message($t("sup.locked_hint"), { kind: "info" });
+      } else {
+        void message($t("replay.export_failed", { err }), { kind: "error" });
+      }
     }
   }
 

@@ -143,7 +143,7 @@
     clearTimeout(debounce);
     debounce = setTimeout(() => {
       livePalette = snap;
-      if (liveApply && loggedIn) {
+      if (liveApply && loggedIn && isSupporter()) {
         lastSentAt = Date.now();
         void sendLiveSkin(paletteToState(snap));
       }
@@ -372,7 +372,7 @@
     // Level B: only when signed in to IslePilot in token mode.
     void islepilotState().then((st) => {
       loggedIn = st.loggedIn && st.authMode === "token";
-      if (loggedIn) void refreshServerPresets();
+      if (loggedIn && isSupporter()) void refreshServerPresets();
     });
     void bag.add(
       onDinoSkin((skin) => {
@@ -468,11 +468,11 @@
       </div>
 
       {#if loggedIn}
-        <label class="live">
-          <input type="checkbox" bind:checked={liveApply} />
-          <span>☁ {$t("skin.live_apply")}</span>
+        <label class="live" class:locked={!isSupporter()}>
+          <input type="checkbox" bind:checked={liveApply} disabled={!isSupporter()} />
+          <span>☁ {isSupporter() ? "" : "★ "}{$t("skin.live_apply")}</span>
         </label>
-        <p class="livehint">{$t("skin.live_hint")}</p>
+        <p class="livehint">{isSupporter() ? $t("skin.live_hint") : $t("sup.locked_hint")}</p>
       {/if}
     </section>
 
@@ -517,7 +517,7 @@
         onkeydown={(e) => e.key === "Enter" && savePreset()}
       />
       <button class="btn" onclick={savePreset} disabled={presetCapped}>{$t("skin.save")}</button>
-      {#if loggedIn}
+      {#if loggedIn && isSupporter()}
         <button class="btn" onclick={() => void saveCloudPreset()}>☁ {$t("skin.save_cloud")}</button>
       {/if}
     </div>
@@ -541,7 +541,7 @@
       <p class="empty">{$t("skin.no_presets")}</p>
     {/if}
 
-    {#if loggedIn && serverPresets.length > 0}
+    {#if loggedIn && isSupporter() && serverPresets.length > 0}
       <p class="eyebrow" style="margin-top: 1rem">☁ {$t("skin.cloud_presets")}</p>
       <div class="chips">
         {#each serverPresets as p (p.id)}
@@ -646,6 +646,10 @@
     font-size: 0.85rem;
     color: var(--color-text);
     cursor: pointer;
+  }
+  .live.locked {
+    opacity: 0.55;
+    cursor: default;
   }
   .livehint {
     margin: 0.25rem 0 0;

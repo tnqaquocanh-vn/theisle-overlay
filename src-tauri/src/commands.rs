@@ -19,7 +19,63 @@ use crate::telemetry;
 
 #[tauri::command]
 pub fn get_settings(state: State<AppState>) -> Value {
-    state.settings.lock_safe().clone()
+    let mut v = state.settings.lock_safe().clone();
+    clamp_supporter_settings(&mut v);
+    v
+}
+
+/// Force the supporter-only settings off when the tier is free — applied to
+/// every value a window sees (get_settings + the settings://changed broadcast),
+/// never to the persisted copy. So a supporter's choices survive a lapse, but
+/// no window ever acts on a Pro toggle without a live licence. Hand-editing
+/// settings.json still "works" until the next settings change re-clamps it;
+/// the licence plan accepts that soft limit.
+pub fn clamp_supporter_settings(v: &mut Value) {
+    if crate::license::is_supporter() {
+        return;
+    }
+    let off = |v: &mut Value, group: &str, key: &str| {
+        if let Some(o) = v.get_mut(group).and_then(Value::as_object_mut) {
+            if o.get(key).and_then(Value::as_bool) == Some(true) {
+                o.insert(key.to_string(), Value::Bool(false));
+            }
+        }
+    };
+    off(v, "minimap", "diagnostics");
+    off(v, "minimap", "auto_preset");
+    off(v, "sound", "enabled");
+    if let Some(m) = v.get_mut("map").and_then(Value::as_object_mut) {
+        let islemaps = m
+            .get("basemap")
+            .and_then(Value::as_str)
+            .is_some_and(|b| b.starts_with("islemaps"));
+        if islemaps {
+            m.insert("basemap".to_string(), Value::String("vulnona".to_string()));
+        }
+    }
+}
+
+/// Does this patch try to turn ON a supporter-only key? Drives the
+/// "supporter required" nudge (the toggle itself is disabled in the UI).
+fn patch_wants_supporter_only(patch: &Value) -> bool {
+    let on = |g: &str, k: &str| {
+        settings::get_path(patch, &[g, k]).and_then(Value::as_bool) == Some(true)
+    };
+    on("minimap", "diagnostics")
+        || on("minimap", "auto_preset")
+        || on("sound", "enabled")
+        || settings::get_path(patch, &["map", "basemap"])
+            .and_then(Value::as_str)
+            .is_some_and(|b| b.starts_with("islemaps"))
+}
+
+/// Re-emit the current settings to every window (used after a licence change so
+/// the clamp above is re-evaluated live).
+pub fn rebroadcast_settings(app: &AppHandle) {
+    let state = app.state::<AppState>();
+    let mut v = state.settings.lock_safe().clone();
+    clamp_supporter_settings(&mut v);
+    crate::events::emit_all(app, SETTINGS_CHANGED, v);
 }
 
 /// Count the settings changes that are really feature use.
@@ -54,8 +110,11 @@ fn count_settings_features(patch: &Value) {
 /// and the hotkey actions so both paths behave identically.
 pub fn apply_settings_patch(app: &AppHandle, patch: Value) -> Value {
     count_settings_features(&patch);
+    if patch_wants_supporter_only(&patch) && !crate::license::is_supporter() {
+        crate::events::emit_all(app, "license://required", "settings");
+    }
     let state = app.state::<AppState>();
-    let (old_language, merged) = {
+    let (old_language, mut merged) = {
         let mut s = state.settings.lock_safe();
         let old_language = settings::get_str(&s, &["language"], "vi").to_string();
         *s = settings::merge(&s, &patch);
@@ -65,6 +124,8 @@ pub fn apply_settings_patch(app: &AppHandle, patch: Value) -> Value {
     if settings::get_str(&merged, &["language"], "vi") != old_language {
         crate::tray::rebuild_menu(app);
     }
+    // Persisted copy keeps the user's real choice; every window sees it clamped.
+    clamp_supporter_settings(&mut merged);
     crate::events::emit_all(app, SETTINGS_CHANGED, merged.clone());
     // Bounce a background worker only when its own toggle is in THIS patch.
     // Otherwise every hotkey/gesture (radius, opacity, visibility) re-locks
@@ -571,6 +632,9 @@ pub fn get_trail_replay(state: State<AppState>, name: String) -> TrailReplayPayl
 /// migration path can be shared or opened elsewhere. Returns the point count.
 #[tauri::command]
 pub fn export_trail_geojson(path: String, name: String) -> Result<usize, String> {
+    if !crate::license::is_supporter() {
+        return Err("supporter_required".into());
+    }
     let segments = store::read_named_trail(&name);
     if segments.is_empty() {
         return Err("trail has no points".into());
@@ -607,6 +671,10 @@ pub fn export_trail_geojson(path: String, name: String) -> Result<usize, String>
 /// the session predates it.
 #[tauri::command]
 pub fn get_trail_stats(start_ms: f64, end_ms: f64) -> Vec<crate::islepilot::history::HistPoint> {
+    // Supporter-only overlay; the replay scrubber itself stays free.
+    if !crate::license::is_supporter() {
+        return Vec::new();
+    }
     const PAD_S: i64 = 120;
     let start_s = (start_ms / 1000.0) as i64 - PAD_S;
     let end_s = (end_ms / 1000.0) as i64 + PAD_S;
@@ -718,6 +786,11 @@ pub fn get_basemap_paths(state: State<AppState>) -> BasemapPaths {
 pub async fn set_basemap_source(app: AppHandle, source: String) -> Result<(), String> {
     let src = MapSource::try_from_key(&source)
         .ok_or_else(|| format!("unknown basemap source {source:?}"))?;
+    // IsleMaps art is a supporter-only basemap; Vulnona stays free.
+    if crate::fetch::IslemapsVariant::for_source(src).is_some() && !crate::license::is_supporter() {
+        crate::events::emit_all(&app, "license://required", "basemap");
+        return Err("supporter_required".into());
+    }
     if let Some(variant) = crate::fetch::IslemapsVariant::for_source(src) {
         if !variant.dest().exists() {
             let app2 = app.clone();
@@ -1507,8 +1580,12 @@ pub async fn islepilot_skin() -> Result<Value, String> {
 }
 
 /// Save or delete a skin preset on IslePilot (`{action:"save"|"delete", …}`).
+/// Supporter-only (cloud presets); the local skin editor stays free.
 #[tauri::command]
 pub async fn islepilot_skin_preset(body: Value) -> Result<Value, String> {
+    if !crate::license::is_supporter() {
+        return Ok(serde_json::json!({ "error": "supporter_required" }));
+    }
     tauri::async_runtime::spawn_blocking(move || crate::islepilot::skin_preset(body))
         .await
         .map_err(|e| e.to_string())?
@@ -1516,8 +1593,12 @@ pub async fn islepilot_skin_preset(body: Value) -> Result<Value, String> {
 
 /// Queue a live skin state to broadcast on the realtime socket. `state` is the
 /// `{skin_body_r: 0.4, …}` RGB-float map the official overlay uses.
+/// Supporter-only ("apply live on your dino").
 #[tauri::command]
 pub fn islepilot_send_liveskin(state: Value) {
+    if !crate::license::is_supporter() {
+        return;
+    }
     crate::islepilot::send_liveskin(state);
 }
 
@@ -1566,24 +1647,33 @@ pub fn license_status() -> crate::license::LicenseStatus {
 
 /// Validate a pasted key against the server and, on success, persist it.
 #[tauri::command]
-pub async fn license_activate(key: String) -> Result<crate::license::LicenseStatus, String> {
-    tauri::async_runtime::spawn_blocking(move || crate::license::activate(&key))
+pub async fn license_activate(
+    app: AppHandle,
+    key: String,
+) -> Result<crate::license::LicenseStatus, String> {
+    let st = tauri::async_runtime::spawn_blocking(move || crate::license::activate(&key))
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+    rebroadcast_settings(&app); // re-evaluate the Pro-feature clamp in every window
+    Ok(st)
 }
 
 /// Re-check the stored key against the server (the "Check again" button).
 #[tauri::command]
-pub async fn license_refresh() -> Result<crate::license::LicenseStatus, String> {
-    tauri::async_runtime::spawn_blocking(crate::license::refresh)
+pub async fn license_refresh(app: AppHandle) -> Result<crate::license::LicenseStatus, String> {
+    let st = tauri::async_runtime::spawn_blocking(crate::license::refresh)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+    rebroadcast_settings(&app);
+    Ok(st)
 }
 
 /// Forget the stored key — drops back to the free tier immediately.
 #[tauri::command]
-pub fn license_clear() -> crate::license::LicenseStatus {
-    crate::license::deactivate()
+pub fn license_clear(app: AppHandle) -> crate::license::LicenseStatus {
+    let st = crate::license::deactivate();
+    rebroadcast_settings(&app);
+    st
 }
 
 /// Open an in-app purchase order (returns the VietQR + memo code, or `{error}`).
