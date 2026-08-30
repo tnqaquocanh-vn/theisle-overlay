@@ -69,6 +69,55 @@
   let cleanup: (() => void) | null = null;
   /** Key of the scene currently built (or being built) — the rebuild guard. */
   let builtKey: string | null = null;
+  /** Species the live scene was built for, and the handles a palette-only
+   *  change needs — so re-colouring swaps two textures instead of tearing
+   *  down the renderer, model and animation (the skin editor drags colours). */
+  let live: {
+    species: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    THREE: any;
+    entry: (typeof DINO_MODELS)[string];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    skinMat: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    eyeMat: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mapTex: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    normalTex: any;
+  } | null = null;
+
+  let recolorSeq = 0;
+
+  /** Palette-only update: rebuild the skin canvases (cached in skin.ts) and
+   *  swap the textures on the standing materials. */
+  async function recolor(pal: DinoPalette) {
+    const l = live;
+    if (!l) return;
+    const gen = generation; // a species change bumps this and aborts us
+    const seq = ++recolorSeq; // a newer recolor supersedes this one
+    const skin = await buildSkin(l.entry, pal);
+    if (gen !== generation || live !== l || seq !== recolorSeq) return;
+    const { THREE } = l;
+    const nextMap = new THREE.CanvasTexture(skin.map);
+    nextMap.flipY = false;
+    nextMap.colorSpace = THREE.SRGBColorSpace;
+    l.mapTex.dispose();
+    l.mapTex = nextMap;
+    l.skinMat.map = nextMap;
+    if (skin.normal) {
+      const nextN = new THREE.CanvasTexture(skin.normal);
+      nextN.flipY = false;
+      l.normalTex?.dispose();
+      l.normalTex = nextN;
+      l.skinMat.normalMap = nextN;
+    }
+    l.skinMat.needsUpdate = true;
+    const eye = new THREE.Color(pal.eyes);
+    l.eyeMat.color.copy(eye);
+    l.eyeMat.emissive.copy(eye).multiplyScalar(0.4);
+    status = "ready";
+  }
 
   async function build(el: HTMLDivElement, sp: string, pal: DinoPalette) {
     const gen = ++generation;
@@ -159,6 +208,8 @@
         roughness: 0.35,
         metalness: 0,
       });
+      // Handles for the fast palette-only path (see `recolor`).
+      live = { species: sp, THREE, entry, skinMat, eyeMat, mapTex, normalTex };
 
       // The cached gltf scene is a shared template — clone (SkeletonUtils
       // keeps skinned meshes/bones intact), then swap materials.
@@ -231,10 +282,12 @@
         io.disconnect();
         ro.disconnect();
         controls.dispose();
-        mapTex.dispose();
-        normalTex?.dispose();
+        // `recolor` may have swapped these out — dispose the CURRENT textures.
+        live?.mapTex?.dispose();
+        live?.normalTex?.dispose();
         skinMat.dispose();
         eyeMat.dispose();
+        live = null;
         // NOTE: geometries belong to the cached template — never disposed here.
         renderer.dispose();
         renderer.domElement.remove();
@@ -259,7 +312,12 @@
     const key = skinKey(sp, pal);
     if (key === builtKey) return;
     builtKey = key;
-    void build(el, sp, pal);
+    // Same species + a live scene → swap textures, keeping camera + animation.
+    if (live && live.species === sp && status === "ready") {
+      void recolor(pal);
+    } else {
+      void build(el, sp, pal);
+    }
   });
 
   onDestroy(() => {

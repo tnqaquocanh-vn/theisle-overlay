@@ -26,13 +26,14 @@
   import NavRail from "./NavRail.svelte";
   import DinoTab from "./dino/DinoTab.svelte";
   import GarageTab from "./garage/GarageTab.svelte";
+  import SkinEditor from "./skin/SkinEditor.svelte";
   import Settings from "./settings/Settings.svelte";
   import Guide from "./guide/Guide.svelte";
   import FirstRun from "./firstrun/FirstRun.svelte";
   import Welcome from "./firstrun/Welcome.svelte";
 
-  type Tab = "map" | "dino" | "garage" | "settings" | "guide";
-  const initialTab = ["map", "dino", "garage", "settings", "guide"].includes(
+  type Tab = "map" | "dino" | "garage" | "skin" | "settings" | "guide";
+  const initialTab = ["map", "dino", "garage", "skin", "settings", "guide"].includes(
     location.hash.slice(1),
   )
     ? (location.hash.slice(1) as Tab)
@@ -45,6 +46,7 @@
     dino: '<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>',
     garage:
       '<path d="M22 8.35V20a2 2 0 0 1-2 2h-4v-9H8v9H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/>',
+    skin: '<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/>',
     settings:
       '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
     guide:
@@ -52,7 +54,7 @@
   };
   let tab = $state<Tab>(initialTab);
   let innerWidth = $state(1280);
-  const NAV_TABS: Tab[] = ["map", "dino", "garage", "settings", "guide"];
+  const NAV_TABS: Tab[] = ["map", "dino", "garage", "skin", "settings", "guide"];
   const navItems = $derived(
     NAV_TABS.map((key) => ({ key, label: $t(`tab.${key}` as never), icon: TAB_ICONS[key] })),
   );
@@ -69,6 +71,9 @@
     map: "fullmap_open",
     dino: "dino_tab_open",
     garage: "islepilot_garage",
+    // Shares the garage slot: same 3D/CDN surface, and the telemetry slot
+    // array is full (see counters.rs — a new slot needs a data-point bump).
+    skin: "islepilot_garage",
     settings: "settings_open",
     guide: "guide_open",
   };
@@ -94,10 +99,12 @@
   let visitedMap = $state(false);
   let visitedDino = $state(false);
   let visitedGarage = $state(false);
+  let visitedSkin = $state(false);
   $effect(() => {
     if (tab === "map") visitedMap = true;
     if (tab === "dino") visitedDino = true;
     if (tab === "garage") visitedGarage = true;
+    if (tab === "skin") visitedSkin = true;
   });
   let dataStatus = $state<DataStatus | null>(null);
   let exclusiveFullscreen = $state(false);
@@ -344,6 +351,25 @@
       <div class="h-full overflow-y-auto" style:display={tab === "garage" ? null : "none"}>
         <svelte:boundary>
           <GarageTab />
+          {#snippet failed(_error, reset)}
+            <div class="mx-auto max-w-lg p-8">
+              <p class="mb-3 text-sm" style="color: #ff8a80">{$t("dino.crashed")}</p>
+              <button
+                class="cursor-pointer rounded border px-3 py-1 text-sm"
+                style="border-color: var(--color-border)"
+                onclick={reset}
+              >
+                {$t("btn.retry")}
+              </button>
+            </div>
+          {/snippet}
+        </svelte:boundary>
+      </div>
+    {/if}
+    {#if ready && visitedSkin}
+      <div class="h-full overflow-y-auto" style:display={tab === "skin" ? null : "none"}>
+        <svelte:boundary>
+          <SkinEditor />
           {#snippet failed(_error, reset)}
             <div class="mx-auto max-w-lg p-8">
               <p class="mb-3 text-sm" style="color: #ff8a80">{$t("dino.crashed")}</p>

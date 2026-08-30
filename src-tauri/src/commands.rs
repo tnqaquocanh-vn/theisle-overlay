@@ -1485,6 +1485,31 @@ pub fn islepilot_logout(app: AppHandle) -> Result<(), String> {
     crate::islepilot::logout(&app)
 }
 
+// --- skin editor: IslePilot "apply live on your dino" (opt-in) --------------
+
+/// The account's saved skin presets. Token mode only.
+#[tauri::command]
+pub async fn islepilot_skin() -> Result<Value, String> {
+    tauri::async_runtime::spawn_blocking(crate::islepilot::skin_fetch)
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+/// Save or delete a skin preset on IslePilot (`{action:"save"|"delete", …}`).
+#[tauri::command]
+pub async fn islepilot_skin_preset(body: Value) -> Result<Value, String> {
+    tauri::async_runtime::spawn_blocking(move || crate::islepilot::skin_preset(body))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+/// Queue a live skin state to broadcast on the realtime socket. `state` is the
+/// `{skin_body_r: 0.4, …}` RGB-float map the official overlay uses.
+#[tauri::command]
+pub fn islepilot_send_liveskin(state: Value) {
+    crate::islepilot::send_liveskin(state);
+}
+
 /// Re-read islepilot settings and (re)start/stop the poller accordingly —
 /// the Dino tab calls this after toggling enabled/interval/map-position.
 #[tauri::command]

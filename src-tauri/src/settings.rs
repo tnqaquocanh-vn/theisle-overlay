@@ -147,6 +147,9 @@ pub fn default_settings() -> Value {
             "y": null,
             "compact": false,
         },
+        // Skin editor: locally-saved dino colour presets. [{ id, name,
+        // species, palette:{10 hex channels}, created }].
+        "skin_presets": [],
         // P5: named overlay-look snapshots. [{ name, patch }].
         "presets": [],
         "hotkeys": {
@@ -396,6 +399,7 @@ mod tests {
         assert_eq!(merged["number_format"], "eu");
         assert_eq!(merged["language"], "vi", "new key gets its default");
         assert_eq!(merged["skin"], "obsidian", "new key gets its default");
+        assert_eq!(merged["skin_presets"], json!([]), "new key gets its default");
         assert_eq!(merged["map"]["basemap"], "vulnona", "new key gets its default");
         assert_eq!(
             active_source(&merged),

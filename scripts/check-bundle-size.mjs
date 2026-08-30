@@ -24,7 +24,7 @@ const ASSETS = fileURLToPath(new URL("../dist/assets", import.meta.url));
 // key = chunk name with the content hash stripped. Values are gzipped-byte
 // ceilings, set ~15-25% over the current size for headroom.
 const BUDGETS = {
-  main: 52_000, // App shell + all tabs, minus Leaflet/three (both split out)
+  main: 58_000, // App shell + all tabs, minus Leaflet/three (both split out). +v1.29 skin editor tab.
   minimap: 16_000, // in-game HUD overlay — keep this SMALL
   bigmap: 12_000, // big-map shell (shares the FullMap chunk)
   companion: 16_000, // A7 2nd-monitor dashboard shell (shares the FullMap chunk)

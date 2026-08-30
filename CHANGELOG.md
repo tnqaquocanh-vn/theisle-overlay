@@ -4,6 +4,43 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.29.0] — 2026-08-30
+
+### Thêm
+
+- **Trình chỉnh Skin** — tab mới trên rail điều hướng. Chỉnh màu da khủng long
+  và xem trực tiếp trên model 3D (dùng lại pipeline dựng skin sẵn có của
+  Garage). Nghiên cứu từ skin editor của overlay gốc *TheIsleVN-Gacha-HUD*.
+  - **10 kênh màu** có nhãn theo ngôn ngữ app (Thân · Hông · Bụng · Hoa văn ·
+    Màu phô diễn · Chi tiết · Mắt · Răng · Miệng · Vuốt): mỗi ô = swatch +
+    bộ chọn màu + ô hex sửa tay.
+  - **🎲 Ngẫu nhiên** (random cả 10 kênh) · **↺ Đặt lại** · **⧉ Sao chép mã** /
+    **⇤ Dán mã** — chuỗi `tio-skin:1|loài|hex×10` để chia sẻ Discord.
+  - **Preset cục bộ**: lưu palette + tên, dòng chip (tag loài), xoá được — ở
+    `settings.skin_presets`. Nhớ palette đang chỉnh dở qua `localStorage`.
+  - Chọn 21 loài có model 3D; tự chọn theo loài đang chơi. Guard
+    `#000000` → `#000001` như app gốc.
+- **Áp trực tiếp lên khủng long qua IslePilot** (tùy chọn, chỉ khi đăng nhập
+  Steam / token mode). Bật ở tab Skin → kéo màu là gửi ngay qua WebSocket
+  realtime (`liveskin`); đồng bộ 2 chiều (màu đổi ở nơi khác → cập nhật lại
+  ô màu). Nút **☁ Lưu lên IslePilot** + dòng preset trên server (áp / xoá).
+
+### Kỹ thuật
+
+- `DinoViewer3D.svelte`: thêm đường `recolor()` — đổi màu chỉ hoán 2
+  `CanvasTexture` trên material đang chạy (skin.ts cache), giữ camera +
+  animation; `$effect` tách nhánh cùng-loài / khác-loài. Debounce palette →
+  viewer 180&nbsp;ms.
+- Rust: `islepilot/api.rs` `skin_get` / `skin_preset_action`
+  (`/api/overlay/skin`, `/api/overlay/skin/presets`); `realtime.rs` OUTBOX +
+  `drain_outbox` gửi `{t:"liveskin"}` mỗi vòng lặp socket + `LiveData.skin` →
+  emit `dino://skin`. Lệnh `islepilot_skin` / `islepilot_skin_preset` /
+  `islepilot_send_liveskin`.
+- `settings.skin_presets: []` (+ merge test). i18n +34 khoá `skin.*` /
+  `tab.skin` (vi + en) → 470/470. Baseline hình ảnh `skin-editor`.
+- Bộ khung test bản đồ lớn (`tauri-mock` cờ `fullmap`) + spec
+  `fullmap` / `replay` / `companion` (bù coverage còn thiếu).
+
 ## [1.28.1] — 2026-08-30
 
 ### Sửa lỗi

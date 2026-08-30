@@ -25,6 +25,17 @@ export interface TrailPayload {
   segmentsPx: [number, number][][];
 }
 
+/** A locally-saved dino colour scheme (skin editor). `palette` holds the 10
+ *  DinoPalette channels as `#rrggbb` — kept as an open map here so api.ts
+ *  stays free of the dino3d module. */
+export interface SkinPreset {
+  id: string;
+  name: string;
+  species: string;
+  palette: Record<string, string>;
+  created: string;
+}
+
 export type Settings = Record<string, unknown> & {
   minimap: {
     visible: boolean;
@@ -79,6 +90,8 @@ export type Settings = Record<string, unknown> & {
   updates?: { auto_check: boolean };
   /** A7 second-monitor companion: remembered geometry + compact (map-less) mode. */
   companion?: { w: number; h: number; x: number | null; y: number | null; compact: boolean };
+  /** Skin editor: locally-saved dino colour presets. */
+  skin_presets?: SkinPreset[];
   islepilot: {
     enabled: boolean;
     /** "token" = one Steam login for every server; "legacy" = per-server cookie. */
@@ -742,6 +755,25 @@ export const islepilotGarageRename = (id: string, name: string) =>
 export const islepilotLogout = () => invoke("islepilot_logout");
 export const islepilotApply = () => invoke("islepilot_apply");
 export const islepilotState = () => invoke<IslepilotState>("islepilot_state");
+
+// -- skin editor: IslePilot "apply live on your dino" (opt-in) --
+
+/** A skin preset stored on IslePilot — `state` is an `{skin_body_r: 0.4, …}` RGB-float map. */
+export interface ServerSkinPreset {
+  id: string;
+  name: string;
+  state: Record<string, number>;
+}
+export const islepilotSkin = () =>
+  invoke<{ presets?: ServerSkinPreset[]; enabled?: boolean }>("islepilot_skin");
+export const islepilotSkinPreset = (body: object) =>
+  invoke<{ id?: string; error?: string }>("islepilot_skin_preset", { body });
+/** Broadcast a live skin state on the realtime socket. */
+export const sendLiveSkin = (state: Record<string, number>) =>
+  invoke("islepilot_send_liveskin", { state });
+/** The account's live skin changed (2-way sync — usually from another client). */
+export const onDinoSkin = (cb: (skin: Record<string, number>) => void): Promise<UnlistenFn> =>
+  listen<Record<string, number>>("dino://skin", (e) => cb(e.payload));
 
 // -- local stat history (Your Dino charts) --
 

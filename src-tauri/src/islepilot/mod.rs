@@ -1674,6 +1674,25 @@ pub fn garage_action(path: &str, body: serde_json::Value) -> Result<serde_json::
     api::garage_command(&client, &tok.token, path, body)
 }
 
+/// GET the account's saved skin presets. Token mode only.
+pub fn skin_fetch() -> Result<serde_json::Value, String> {
+    let tok = token_or_err()?;
+    let client = http_client()?;
+    api::skin_get(&client, &tok.token).map_err(|e| e.to_string())
+}
+
+/// POST a skin-preset action (`{action:"save"|"delete", …}`).
+pub fn skin_preset(body: serde_json::Value) -> Result<serde_json::Value, String> {
+    let tok = token_or_err()?;
+    let client = http_client()?;
+    api::skin_preset_action(&client, &tok.token, &body).map_err(|e| e.to_string())
+}
+
+/// Queue a `liveskin` frame for the realtime socket ("apply live on your dino").
+pub fn send_liveskin(state: serde_json::Value) {
+    realtime::queue_liveskin(state);
+}
+
 /// Log out of the ACTIVE mode only: token mode drops the central token,
 /// legacy mode drops the current domain's cookie (others stay stored).
 pub fn logout(app: &AppHandle) -> Result<(), String> {

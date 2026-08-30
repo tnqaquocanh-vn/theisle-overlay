@@ -11,10 +11,12 @@
 
 use std::net::TcpStream;
 use std::sync::atomic::Ordering;
+use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
 use serde::Deserialize;
-use tauri::{AppHandle, Manager};
+use serde_json::Value;
+use tauri::{AppHandle, Emitter, Manager};
 use tungstenite::client::IntoClientRequest;
 use tungstenite::stream::MaybeTlsStream;
 use tungstenite::{Message, WebSocket};
@@ -28,6 +30,33 @@ use super::token::OverlayToken;
 use super::{now_ms, publish, read_config, DinoUpdate, GENERATION, LAST_UPDATE};
 
 const WS_URL: &str = "wss://islepilot.eu/ows";
+
+/// `liveskin` frames the skin editor wants sent on the next socket pass. Kept
+/// tiny — a burst while disconnected drops the oldest (the editor debounces,
+/// and only the newest colour state matters).
+static OUTBOX: Mutex<Vec<String>> = Mutex::new(Vec::new());
+const OUTBOX_MAX: usize = 8;
+
+/// Queue `{t:"liveskin", d:<state>}` for the realtime socket. No-op-safe when
+/// the socket is down: it flushes on connect, or is cleared on reconnect.
+pub fn queue_liveskin(state: Value) {
+    if let Ok(mut q) = OUTBOX.lock() {
+        if q.len() >= OUTBOX_MAX {
+            q.remove(0);
+        }
+        q.push(serde_json::json!({ "t": "liveskin", "d": state }).to_string());
+    }
+}
+
+fn drain_outbox(socket: &mut WebSocket<MaybeTlsStream<TcpStream>>) -> Result<(), Exit> {
+    let frames: Vec<String> = OUTBOX.lock().map(|mut q| std::mem::take(&mut *q)).unwrap_or_default();
+    for frame in frames {
+        socket
+            .send(Message::Text(frame))
+            .map_err(|e| Exit::Transient(e.to_string()))?;
+    }
+    Ok(())
+}
 /// Reconnect delays (seconds), same ladder as IsleLiveMap; last value repeats.
 const BACKOFF_S: [f64; 5] = [1.0, 2.0, 4.0, 8.0, 15.0];
 const READ_TIMEOUT: Duration = Duration::from_secs(1);
@@ -54,6 +83,9 @@ struct LiveData {
     max_stamina: Option<f64>,
     nutrition: Option<api::OverlayNutrition>,
     position: Option<api::OverlayPosition>,
+    /// `{skin_body_r: 0.4, …}` — echoed when the account's live skin changes
+    /// (skin editor 2-way sync). Passed straight through to the frontend.
+    skin: Option<Value>,
 }
 
 enum Exit {
@@ -122,6 +154,11 @@ fn connect_and_pump(app: &AppHandle, generation: u64, tok: &OverlayToken) -> Res
     };
     set_read_timeout(&mut socket, READ_TIMEOUT);
 
+    // A fresh connection: drop any `liveskin` frames queued against the old one.
+    if let Ok(mut q) = OUTBOX.lock() {
+        q.clear();
+    }
+
     // Hello frame ({"t":"hello"}); persona name is optional and the REST /me
     // path already carries it, so send null.
     socket
@@ -142,6 +179,8 @@ fn connect_and_pump(app: &AppHandle, generation: u64, tok: &OverlayToken) -> Res
             let _ = socket.send(Message::Ping(Vec::new()));
             last_ping = Instant::now();
         }
+
+        drain_outbox(&mut socket)?;
 
         match socket.read() {
             Ok(Message::Text(text)) => handle_frame(app, &text, cfg.use_map_position),
@@ -179,6 +218,11 @@ fn handle_frame(app: &AppHandle, text: &str, use_map_position: bool) {
     let Some(d) = frame.d else {
         return;
     };
+
+    // Live skin echo — hand it straight to the skin editor (2-way sync).
+    if let Some(skin) = &d.skin {
+        let _ = app.emit("dino://skin", skin.clone());
+    }
 
     // Position: their x = our y (Long), their y = our x (Lat) — same swap
     // `api::position_cm` uses. Skipped while G1 packet capture owns position.

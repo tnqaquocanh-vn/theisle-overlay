@@ -343,6 +343,25 @@ pub fn poi_point_cm(
 }
 
 // ---------------------------------------------------------------------------
+// /api/overlay/skin — saved colour presets + the "apply live on your dino"
+// sync (the frame itself goes out on the WebSocket, see realtime.rs).
+// ---------------------------------------------------------------------------
+
+/// GET the account's saved skin presets: `{ presets: [{ id, name, state }], … }`.
+pub fn skin_get(client: &reqwest::blocking::Client, token: &str) -> Result<Value, ApiError> {
+    get(client, "/api/overlay/skin", token)
+}
+
+/// POST a skin-preset action: `{ action: "save"|"delete", … }`.
+pub fn skin_preset_action(
+    client: &reqwest::blocking::Client,
+    token: &str,
+    body: &Value,
+) -> Result<Value, ApiError> {
+    post(client, "/api/overlay/skin/presets", token, body)
+}
+
+// ---------------------------------------------------------------------------
 // /api/overlay/garage — gacha park/restore/sell/rename
 // ---------------------------------------------------------------------------
 
