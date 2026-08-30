@@ -518,6 +518,8 @@ export const vi = {
     "vì server xử lý bất đồng bộ.",
   "garage.refresh": "Làm mới",
   "garage.park": "Park dino hiện tại",
+  "garage.slay": "💀 Giết khủng long",
+  "garage.slay_confirm": "Giết khủng long đang chơi? Con này sẽ chết ngay trong game và KHÔNG lấy lại được.",
   "garage.restore": "Restore",
   "garage.sell": "Bán",
   "garage.rename": "Đổi tên",

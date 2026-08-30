@@ -740,6 +740,8 @@ export interface GarageState {
   dinos: GarageDino[];
   sellingEnabled: boolean;
   liveSwap: boolean;
+  /** Server allows the "Slay" (kill your current dino) action. */
+  selfSlayEnabled: boolean;
   currencyName: string | null;
 }
 
@@ -752,6 +754,8 @@ export const islepilotGarageSell = (id: string) =>
   invoke("islepilot_garage_sell", { id });
 export const islepilotGarageRename = (id: string, name: string) =>
   invoke("islepilot_garage_rename", { id, name });
+/** Slay (kill) the current in-game dino. Server-gated by selfSlayEnabled. */
+export const islepilotGarageSlay = () => invoke("islepilot_garage_slay");
 export const islepilotLogout = () => invoke("islepilot_logout");
 export const islepilotApply = () => invoke("islepilot_apply");
 export const islepilotState = () => invoke<IslepilotState>("islepilot_state");

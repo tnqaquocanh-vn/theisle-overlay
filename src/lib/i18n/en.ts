@@ -494,6 +494,8 @@ export const en: Record<MsgKey, string> = {
     "server processes commands asynchronously.",
   "garage.refresh": "Refresh",
   "garage.park": "Park current dino",
+  "garage.slay": "💀 Slay dino",
+  "garage.slay_confirm": "Slay your current dino? It dies in-game immediately and CANNOT be recovered.",
   "garage.restore": "Restore",
   "garage.sell": "Sell",
   "garage.rename": "Rename",

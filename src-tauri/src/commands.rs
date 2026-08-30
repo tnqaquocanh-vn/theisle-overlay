@@ -1480,6 +1480,17 @@ pub async fn islepilot_garage_rename(id: String, name: String) -> Result<Value, 
     .map_err(|e| e.to_string())?
 }
 
+/// Slay (kill) the CURRENT in-game dino. Server-gated by
+/// `garage.settings.selfSlayEnabled`; blocks through the async-command poll.
+#[tauri::command]
+pub async fn islepilot_garage_slay() -> Result<Value, String> {
+    tauri::async_runtime::spawn_blocking(|| {
+        crate::islepilot::garage_action("/api/overlay/garage/slay", serde_json::json!({}))
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
 #[tauri::command]
 pub fn islepilot_logout(app: AppHandle) -> Result<(), String> {
     crate::islepilot::logout(&app)

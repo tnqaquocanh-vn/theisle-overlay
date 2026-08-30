@@ -143,6 +143,7 @@ pub fn run(replay_file: Option<PathBuf>) {
             commands::islepilot_garage_restore,
             commands::islepilot_garage_sell,
             commands::islepilot_garage_rename,
+            commands::islepilot_garage_slay,
             commands::islepilot_skin,
             commands::islepilot_skin_preset,
             commands::islepilot_send_liveskin,

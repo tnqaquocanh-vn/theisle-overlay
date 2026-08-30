@@ -15,6 +15,7 @@
     islepilotGarageRename,
     islepilotGarageRestore,
     islepilotGarageSell,
+    islepilotGarageSlay,
     islepilotState,
     listenerBag,
     onDinoLoginOk,
@@ -190,6 +191,16 @@
         >
           {$t("garage.park")}
         </button>
+        {#if garage?.selfSlayEnabled}
+          <button
+            class="cursor-pointer rounded border px-3 py-1 text-sm disabled:opacity-50"
+            style="border-color: #d9604a; color: #ff8a80"
+            disabled={garageBusy}
+            onclick={() => void garageDo(() => islepilotGarageSlay(), tNow("garage.slay_confirm"))}
+          >
+            {$t("garage.slay")}
+          </button>
+        {/if}
       </div>
     {/if}
   </div>

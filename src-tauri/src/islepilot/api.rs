@@ -419,21 +419,20 @@ pub struct GarageState {
     pub dinos: Value,
     pub selling_enabled: bool,
     pub live_swap: bool,
+    /// `settings.selfSlayEnabled` — the server allows the "Slay" (kill your
+    /// current dino) action.
+    pub self_slay_enabled: bool,
     pub currency_name: Option<String>,
 }
 
 pub fn garage_state(raw: &Value) -> GarageState {
     let settings = raw.get("settings").cloned().unwrap_or(Value::Null);
+    let flag = |k: &str| settings.get(k).and_then(|v| v.as_bool()).unwrap_or(false);
     GarageState {
         dinos: raw.get("dinos").cloned().unwrap_or_else(|| Value::Array(vec![])),
-        selling_enabled: settings
-            .get("sellingEnabled")
-            .and_then(|v| v.as_bool())
-            .unwrap_or(false),
-        live_swap: settings
-            .get("liveSwap")
-            .and_then(|v| v.as_bool())
-            .unwrap_or(false),
+        selling_enabled: flag("sellingEnabled"),
+        live_swap: flag("liveSwap"),
+        self_slay_enabled: flag("selfSlayEnabled"),
         currency_name: settings
             .get("currencyName")
             .and_then(|v| v.as_str())

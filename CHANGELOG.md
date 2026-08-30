@@ -4,6 +4,22 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.30.0] — 2026-08-30
+
+### Thêm
+
+- **Giết khủng long (Slay)** — như trên web IslePilot. Nút **💀 Giết khủng long**
+  ở tab **Garage**, chỉ hiện khi server cho phép (`selfSlayEnabled`). Có hộp
+  xác nhận cảnh báo (con này chết ngay trong game, không lấy lại được). Dùng
+  chung cơ chế lệnh bất đồng bộ với Park/Restore/Sell
+  (`POST /api/overlay/garage/slay`).
+
+### Kỹ thuật
+
+- Rust: `GarageState.self_slay_enabled` (từ `settings.selfSlayEnabled`);
+  lệnh `islepilot_garage_slay`. `api.ts`: `GarageState.selfSlayEnabled` +
+  `islepilotGarageSlay`.
+
 ## [1.29.2] — 2026-08-30
 
 ### Thêm
