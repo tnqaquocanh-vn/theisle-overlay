@@ -4,6 +4,14 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.33.1] — 2026-08-30
+
+### Đổi
+
+- **Biểu tượng ứng dụng mới** — kim la bàn (bắc màu hổ phách, nam xám ấm) trên
+  đĩa minimap, đúng bảng màu Amber. Nguồn vector ở `src-tauri/icons/app-icon.svg`;
+  tạo lại toàn bộ bộ icon bằng `tauri icon`. Tray icon lấy theo bộ mới tự động.
+
 ## [1.33.0] — 2026-08-30
 
 ### Đổi

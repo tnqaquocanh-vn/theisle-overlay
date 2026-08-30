@@ -18,8 +18,8 @@ blob-report/
 *.key
 *.key.pub
 
-# Machine-local Claude Code settings
-.claude/settings.local.json
+# Local editor / assistant tooling
+.claude/
 
 # Prebuilt installers (releases come from CI now)
 *_x64-setup.exe
