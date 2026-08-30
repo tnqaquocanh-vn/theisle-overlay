@@ -63,6 +63,7 @@ pub fn run(replay_file: Option<PathBuf>) {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         // In-app auto-update (checks the signed GitHub-Releases feed).
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())

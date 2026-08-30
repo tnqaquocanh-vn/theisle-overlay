@@ -5,6 +5,7 @@
   // settings.skin_presets, share codes go through the clipboard. Nothing is
   // sent to IslePilot and nothing touches the game.
   import { onMount } from "svelte";
+  import { readText, writeText } from "@tauri-apps/plugin-clipboard-manager";
   import {
     getSettings,
     islepilotSkin,
@@ -94,6 +95,19 @@
 
   let species = $state(SPECIES[0] ?? "Tenontosaurus");
   let palette = $state<DinoPalette>({ ...DEFAULT_PALETTE });
+  // Carried in the game skin code (`<Species><P><V><T><rgba×5>`): Pattern
+  // (1-8), Pattern Variation, Theme. Editable Pattern; V/T are round-tripped.
+  let patternIdx = $state(1);
+  let variationIdx = $state(0);
+  let themeIdx = $state(0);
+  // The game code's 5 colours, in its order.
+  const GAME_ORDER: (keyof DinoPalette)[] = [
+    "underbelly",
+    "body",
+    "flank",
+    "markings",
+    "display",
+  ];
   // The viewer only follows this — a ~200 ms debounce keeps a colour drag
   // from re-compositing the 2K skin texture on every frame.
   let livePalette = $state<DinoPalette>({ ...DEFAULT_PALETTE });
@@ -130,9 +144,9 @@
   });
   $effect(() => () => clearTimeout(debounce));
 
-  // Persist the working draft (species + palette) as a per-machine convenience.
+  // Persist the working draft (species + palette + pattern) as a convenience.
   $effect(() => {
-    const snap = JSON.stringify({ species, palette });
+    const snap = JSON.stringify({ species, palette, patternIdx, variationIdx, themeIdx });
     try {
       localStorage.setItem(DRAFT_KEY, snap);
     } catch {
@@ -171,46 +185,107 @@
     hexBad = {};
   }
 
-  function encode(): string {
+  /** App-to-app code: `tio-skin:1|<species>|<hex×10>`. */
+  function encodeApp(): string {
     return `${CODE_PREFIX}|${species}|${ORDER.map((k) => palette[k].replace("#", "")).join(",")}`;
   }
 
-  async function copyCode() {
+  /** The Isle Evrima's own skin string: `<Species><P><V><T>` then five
+   *  `RRGGBBAA` colours (alpha FF) in [underbelly, body, flank, markings,
+   *  display] order — pastes straight into the in-game "Import". */
+  function encodeGame(): string {
+    const nib = (n: number) => Math.max(0, Math.min(15, Math.round(n))).toString(16).toUpperCase();
+    const rgba = (hex: string) => hex.replace("#", "").toUpperCase() + "FF";
+    return (
+      species + nib(patternIdx) + nib(variationIdx) + nib(themeIdx) + GAME_ORDER.map((k) => rgba(palette[k])).join("")
+    );
+  }
+
+  function decodeGame(raw: string): boolean {
+    const s = raw.trim();
+    const sp =
+      SPECIES.filter((x) => s.startsWith(x)).sort((a, b) => b.length - a.length)[0] ??
+      SPECIES.find((x) => s.toLowerCase().startsWith(x.toLowerCase()));
+    if (!sp) return false;
+    const rest = s.slice(sp.length);
+    // 3 header nibbles + 5 × RRGGBBAA
+    if (!/^[0-9a-fA-F]{43}$/.test(rest)) return false;
+    const next = { ...palette };
+    GAME_ORDER.forEach((k, i) => {
+      const c6 = rest.slice(3 + i * 8, 3 + i * 8 + 6).toLowerCase();
+      next[k] = c6 === "000000" ? "#000001" : `#${c6}`;
+    });
+    patternIdx = parseInt(rest[0], 16) || 1;
+    variationIdx = parseInt(rest[1], 16);
+    themeIdx = parseInt(rest[2], 16);
+    if (hasModel(sp)) species = sp;
+    palette = next;
+    hexBad = {};
+    return true;
+  }
+
+  async function writeClip(text: string): Promise<boolean> {
     try {
-      await navigator.clipboard?.writeText(encode());
-      flashToast($t("skin.copied"));
+      await writeText(text);
+      return true;
     } catch {
-      flashToast(encode());
+      try {
+        await navigator.clipboard?.writeText(text);
+        return true;
+      } catch {
+        return false;
+      }
     }
+  }
+
+  async function copyGame() {
+    const code = encodeGame();
+    flashToast((await writeClip(code)) ? $t("skin.copied_game") : code);
+  }
+  async function copyApp() {
+    const code = encodeApp();
+    flashToast((await writeClip(code)) ? $t("skin.copied_app") : code);
   }
 
   async function pasteCode() {
     let text = "";
     try {
-      text = (await navigator.clipboard?.readText()) ?? "";
+      text = await readText();
     } catch {
-      /* fall through to the error toast */
+      try {
+        text = (await navigator.clipboard?.readText()) ?? "";
+      } catch {
+        /* fall through to the error toast */
+      }
     }
-    const m = text.trim().match(/^tio-skin:1\|([^|]+)\|(.+)$/);
-    const parts = m?.[2].split(",") ?? [];
-    if (!m || parts.length !== ORDER.length) {
+    text = text.trim();
+
+    // App format.
+    const m = text.match(/^tio-skin:1\|([^|]+)\|(.+)$/);
+    if (m) {
+      const parts = m[2].split(",");
+      if (parts.length === ORDER.length) {
+        const next = { ...DEFAULT_PALETTE };
+        let ok = true;
+        ORDER.forEach((k, i) => {
+          const n = normHex(parts[i]);
+          if (n) next[k] = n;
+          else ok = false;
+        });
+        if (ok) {
+          if (hasModel(m[1])) species = m[1];
+          palette = next;
+          hexBad = {};
+          return;
+        }
+      }
       flashToast($t("skin.paste_bad"));
       return;
     }
-    const next = { ...DEFAULT_PALETTE };
-    let ok = true;
-    ORDER.forEach((k, i) => {
-      const n = normHex(parts[i]);
-      if (n) next[k] = n;
-      else ok = false;
-    });
-    if (!ok) {
-      flashToast($t("skin.paste_bad"));
-      return;
-    }
-    if (hasModel(m[1])) species = m[1];
-    palette = next;
-    hexBad = {};
+
+    // Game format.
+    if (decodeGame(text)) return;
+    flashToast($t("skin.paste_bad"));
   }
 
   function savePreset() {
@@ -303,9 +378,18 @@
     try {
       const raw = localStorage.getItem(DRAFT_KEY);
       if (raw) {
-        const d = JSON.parse(raw) as { species?: string; palette?: Partial<DinoPalette> };
+        const d = JSON.parse(raw) as {
+          species?: string;
+          palette?: Partial<DinoPalette>;
+          patternIdx?: number;
+          variationIdx?: number;
+          themeIdx?: number;
+        };
         if (d.species && hasModel(d.species)) species = d.species;
         if (d.palette) palette = { ...DEFAULT_PALETTE, ...d.palette };
+        if (typeof d.patternIdx === "number") patternIdx = d.patternIdx;
+        if (typeof d.variationIdx === "number") variationIdx = d.variationIdx;
+        if (typeof d.themeIdx === "number") themeIdx = d.themeIdx;
         livePalette = { ...palette };
         seeded = true;
       }
@@ -349,10 +433,22 @@
         <p class="nomodel">{$t("skin.no_model")}</p>
       {/if}
 
+      <label class="species pat">
+        <span>{$t("skin.pattern")}</span>
+        <select bind:value={patternIdx}>
+          {#each [1, 2, 3, 4, 5, 6, 7, 8] as n (n)}
+            <option value={n}>{n}</option>
+          {/each}
+        </select>
+      </label>
+
       <div class="actions">
         <button class="btn primary" class:rolling onclick={randomize}>🎲 {$t("skin.randomize")}</button>
         <button class="btn" onclick={reset}>↺ {$t("skin.reset")}</button>
-        <button class="btn" onclick={() => void copyCode()}>⧉ {$t("skin.copy")}</button>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick={() => void copyGame()}>⧉ {$t("skin.copy_game")}</button>
+        <button class="btn" onclick={() => void copyApp()}>⧉ {$t("skin.copy_app")}</button>
         <button class="btn" onclick={() => void pasteCode()}>⇤ {$t("skin.paste")}</button>
       </div>
 
@@ -507,6 +603,12 @@
     border-radius: 6px;
     padding: 0.35rem 0.5rem;
     font-size: 0.85rem;
+  }
+  .species.pat {
+    margin: 0.6rem 0 0;
+  }
+  .species.pat select {
+    flex: 0 0 5rem;
   }
   .stage {
     border: 1px solid var(--color-border);

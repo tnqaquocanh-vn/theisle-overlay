@@ -1,6 +1,6 @@
 [package]
 name = "theisle-overlay"
-version = "1.29.0"
+version = "1.29.1"
 description = "Map overlay for The Isle: Evrima (Gateway)"
 edition = "2021"
 default-run = "theisle-overlay"
@@ -36,6 +36,7 @@ tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 tauri-plugin-deep-link = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-opener = "2"
+tauri-plugin-clipboard-manager = "2"
 tauri-plugin-log = "2"
 tauri-plugin-notification = "2"
 # In-app auto-update: checks a signed latest.json on GitHub Releases, downloads

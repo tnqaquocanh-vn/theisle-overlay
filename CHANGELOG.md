@@ -4,6 +4,30 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.29.1] — 2026-08-30
+
+### Thêm
+
+- **Mã skin dùng được với game.** Nút **⧉ Sao chép mã game** trong tab Skin
+  xuất đúng định dạng skin gốc của The Isle Evrima
+  (`<Loài><Pattern><Variation><Theme>` + 5 màu `RRGGBBAA`) — dán thẳng vào nút
+  **Import** trong màn chỉnh nhân vật của game. **⇤ Dán mã** tự nhận cả mã game
+  lẫn mã app (`tio-skin:`). Thêm bộ chọn **Pattern** (1–8) vì mã game có mang
+  chỉ số pattern.
+- Nút **⧉ Mã app** riêng cho chia sẻ giữa người dùng overlay
+  (`tio-skin:1|loài|hex×10`).
+
+### Sửa lỗi
+
+- Nút Sao chép / Dán mã dùng **clipboard Tauri chuẩn**
+  (`plugin-clipboard-manager`) thay cho `navigator.clipboard` — trước đây
+  "sao chép không ra" trong cửa sổ Tauri.
+
+### Không đổi
+
+- Định dạng đẩy skin qua **live apply (WebSocket `liveskin`)** giữ nguyên
+  (`{skin_body_r: 0.4, …}` RGB float, đủ 10 kênh như overlay gốc).
+
 ## [1.29.0] — 2026-08-30
 
 ### Thêm
