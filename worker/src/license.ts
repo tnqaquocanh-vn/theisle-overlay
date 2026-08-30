@@ -225,8 +225,9 @@ async function orderStatus(req: Request, env: Env, raw: string): Promise<Respons
 // SePay (sepay.vn) webhook: fires when money lands in the linked bank account.
 // Auth header is `Authorization: Apikey <SEPAY_API_KEY>`.
 async function sepay(req: Request, env: Env): Promise<Response> {
-  const auth = req.headers.get("authorization") ?? "";
-  if (!env.SEPAY_API_KEY || !timingSafeEqual(auth, `Apikey ${env.SEPAY_API_KEY}`)) {
+  // SePay sends `Authorization: Apikey <key>`. Match the scheme case-insensitively.
+  const authMatch = (req.headers.get("authorization") ?? "").match(/^apikey\s+(.+)$/i);
+  if (!env.SEPAY_API_KEY || !authMatch || !timingSafeEqual(authMatch[1].trim(), env.SEPAY_API_KEY)) {
     return new Response("ok"); // ignore spoofed calls silently
   }
   let d: Record<string, unknown>;
