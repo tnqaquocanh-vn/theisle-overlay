@@ -10,6 +10,14 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.37.1] — 2026-08-31
+
+### Thêm
+
+- **⚡ Chế độ nhẹ (Cài đặt → Bản đồ nhỏ)** cho máy CPU yếu bị giật khi chạy
+  overlay. Bật lên: minimap giới hạn ~24 hình/giây, ảnh bản đồ nhẹ hơn, bỏ hiệu
+  ứng trượt mượt và lớp sương mù. Mặc định TẮT — máy khoẻ chạy y như cũ.
+
 ## [1.37.0] — 2026-08-31
 
 ### Sửa
