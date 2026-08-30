@@ -530,8 +530,8 @@ export const en: Record<MsgKey, string> = {
   "btn.retry": "Retry",
 
 
-  "footer.based_on": "Based on TheIsle Overlay (open source)",
-  "footer.source_link": "Source",
+  "footer.based_on": "TheIsle Overlay · built by BumBum",
+  "footer.source_link": "GitHub",
   "footer.reload_hint": "If the app breaks, press F5 or Ctrl+Alt+R to reload",
 
 

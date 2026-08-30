@@ -558,8 +558,8 @@ export const vi = {
   // --- cập nhật ---
 
   // --- footer ---
-  "footer.based_on": "Dựa trên TheIsle Overlay (mã nguồn mở)",
-  "footer.source_link": "Mã nguồn",
+  "footer.based_on": "TheIsle Overlay · phát triển bởi BumBum",
+  "footer.source_link": "GitHub",
   "footer.reload_hint": "Nếu ứng dụng bị lỗi, nhấn F5 hoặc Ctrl+Alt+R để tải lại",
 
 

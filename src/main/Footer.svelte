@@ -1,11 +1,10 @@
 <script lang="ts">
-  // Bottom credit bar: minimal upstream attribution + a link to the
-  // open-source project this build is based on (opened in the system
-  // browser).
+  // Bottom credit bar: build version + the project link (opened in the
+  // system browser).
   import { openUrl } from "@tauri-apps/plugin-opener";
   import { t } from "$lib/i18n";
 
-  const SOURCE_URL = "https://github.com/toantranct/theisle-overlay";
+  const SOURCE_URL = "https://github.com/tnqaquocanh-vn/theisle-overlay";
 </script>
 
 <footer

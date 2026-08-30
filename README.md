@@ -218,15 +218,10 @@ Không liên kết với Afterthought LLC.
 
 ## Liên hệ & Ủng hộ
 
-Được phát triển bởi **Trần Quốc Toản**.
+Phát triển bởi **BumBum**.
 
-- 📧 Email: toantranct1@gmail.com
-- 💬 Facebook: https://www.facebook.com/satann247/
 - 🐛 Báo lỗi / góp ý: [GitHub Issues](https://github.com/tnqaquocanh-vn/theisle-overlay/issues)
 
-App miễn phí và mã nguồn mở. Nếu thấy hữu ích, bạn có thể mời tác giả một ly
-cà phê:
-
-<img src="docs/qr_donate.png" alt="VietQR — Techcombank 8866886767 TRAN QUOC TOAN" width="280">
-
-**Techcombank · 8866886767 · TRAN QUOC TOAN**
+<!-- TODO(BumBum): thêm phương thức ủng hộ của bạn (VietQR / Ko-fi / …) và
+     ảnh QR riêng vào docs/. Ảnh donate cũ đã được gỡ. -->
+Một số tính năng nâng cao dành cho người ủng hộ (xem mục *Người ủng hộ*).

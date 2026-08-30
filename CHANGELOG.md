@@ -4,6 +4,20 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.30.1] — 2026-08-30
+
+### Đổi
+
+- **Đổi thương hiệu → BumBum.** Gỡ thông tin tác giả cũ khỏi phần người dùng
+  nhìn thấy: footer ("TheIsle Overlay · phát triển bởi BumBum"), link GitHub
+  trỏ về repo hiện tại, mục Liên hệ trong README (bỏ email/Facebook cá nhân +
+  ảnh QR ủng hộ cũ). Endpoint telemetry đổi khỏi tên miền tác giả cũ (telemetry
+  vẫn tắt cho tới khi bạn tự deploy `worker/`). Allowlist mở URL cập nhật theo
+  repo mới.
+- Ghi chú attribution trong mã nguồn (các đoạn port từ IsleLiveMap/overlay gốc,
+  MIT) **giữ nguyên** — xoá đi là vi phạm giấy phép. Xem kế hoạch giấy phép để
+  xử lý đúng cách.
+
 ## [1.30.0] — 2026-08-30
 
 ### Thêm

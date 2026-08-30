@@ -26,7 +26,10 @@ use super::attest;
 /// the one failure mode this whole design exists to avoid. Do not write that
 /// marker anywhere in this file, including in a comment: the grep cannot tell
 /// prose from code, and a false hit blocks every release.
-const API_BASES: [&str; 1] = ["https://theisle-overlay-api.toantranct1.workers.dev"];
+// Point this at your own deployed `worker/` (Cloudflare). Until then telemetry
+// is inert: the release build ships with an empty signing key when
+// TELEMETRY_MASTER is unset, so nothing is ever sent.
+const API_BASES: [&str; 1] = ["https://theisle-overlay-api.bumbum.workers.dev"];
 
 const TIMEOUT: Duration = Duration::from_secs(5);
 
