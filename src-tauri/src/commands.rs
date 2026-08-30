@@ -1586,6 +1586,23 @@ pub fn license_clear() -> crate::license::LicenseStatus {
     crate::license::deactivate()
 }
 
+/// Open an in-app purchase order (returns the VietQR + memo code, or `{error}`).
+#[tauri::command]
+pub async fn license_order_new() -> Result<Value, String> {
+    tauri::async_runtime::spawn_blocking(crate::license::order_new)
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+/// Poll a purchase order: `{status, key}`. The frontend activates `key` itself
+/// (via `license_activate`) once `status == "paid"`.
+#[tauri::command]
+pub async fn license_order_poll(code: String) -> Result<Value, String> {
+    tauri::async_runtime::spawn_blocking(move || crate::license::order_poll(&code))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
 /// Dev-only: feed a fake sample through the real pipeline.
 #[cfg(debug_assertions)]
 #[tauri::command]

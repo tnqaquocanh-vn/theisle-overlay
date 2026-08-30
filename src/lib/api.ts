@@ -844,6 +844,27 @@ export const licenseRefresh = () => invoke<LicenseStatus>("license_refresh");
 /** Forget the stored key (drops to free immediately). */
 export const licenseClear = () => invoke<LicenseStatus>("license_clear");
 
+/** An in-app purchase order — the app shows the QR and polls until paid. */
+export interface LicenseOrder {
+  code: string;
+  amount: number;
+  addInfo: string;
+  ttlMin: number;
+  bank: { bin: string; account: string; name: string };
+  qrUrl: string;
+  /** Set instead of the above when the server has no bank configured yet. */
+  error?: "not_configured" | "rate" | "server" | string;
+}
+export interface LicenseOrderStatus {
+  status: "pending" | "paid" | "expired" | "unknown";
+  key: string | null;
+}
+/** Open a purchase order (VietQR + memo code). */
+export const licenseOrderNew = () => invoke<LicenseOrder>("license_order_new");
+/** Poll one order; on `"paid"` the caller activates `key`. */
+export const licenseOrderPoll = (code: string) =>
+  invoke<LicenseOrderStatus>("license_order_poll", { code });
+
 /** Rust rejected a supporter-gated action; `feature` is a short slug. */
 export const onSupporterRequired = (
   cb: (feature: string) => void,

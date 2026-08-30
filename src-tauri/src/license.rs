@@ -237,6 +237,41 @@ pub fn refresh_if_stale() {
     }
 }
 
+// --- in-app "Mua mã" order flow -----------------------------------------
+
+fn get_json(url: &str) -> Result<serde_json::Value, String> {
+    let resp = client().get(url).send().map_err(|e| e.to_string())?;
+    let text = resp.text().map_err(|e| e.to_string())?;
+    serde_json::from_str(&text).map_err(|e| e.to_string())
+}
+
+/// Open a purchase order on the server. Returns the raw JSON
+/// (`{code, amount, addInfo, ttlMin, bank:{…}, qrUrl}` or `{error}`).
+pub fn order_new() -> Result<serde_json::Value, String> {
+    let body = serde_json::json!({ "fp": machine_fp() });
+    let resp = client()
+        .post(format!("{LICENSE_BASE}/v1/license/order/new"))
+        .header("content-type", "application/json")
+        .body(body.to_string())
+        .send()
+        .map_err(|e| e.to_string())?;
+    let text = resp.text().map_err(|e| e.to_string())?;
+    serde_json::from_str(&text).map_err(|e| e.to_string())
+}
+
+/// Poll one order. Returns `{status: "pending"|"paid"|"expired"|"unknown",
+/// key: string|null}`. `key` is only filled when paid AND the fp matches.
+pub fn order_poll(code: &str) -> Result<serde_json::Value, String> {
+    let code = code.trim().to_uppercase();
+    if code.len() != 9 || !code.starts_with("TIO") {
+        return Err("bad_code".into());
+    }
+    get_json(&format!(
+        "{LICENSE_BASE}/v1/license/order/{code}?fp={}",
+        machine_fp()
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

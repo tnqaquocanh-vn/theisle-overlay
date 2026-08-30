@@ -39,7 +39,7 @@ function fromVarsFile(key) {
 }
 
 const USAGE =
-  "commands: check | mint [--count N] [--note ..] [--email ..] [--source manual|kofi] | list | pending | sent <KEY> | revoke <KEY>";
+  "commands: check | mint [--count N] [--note ..] [--email ..] [--source manual|kofi] | list | pending | sent <KEY> | revoke <KEY> | orders | order-paid <TIOxxxxxx>";
 
 if (!cmd) {
   console.log(USAGE);
@@ -161,6 +161,31 @@ switch (cmd) {
     if (!key) throw new Error("usage: revoke <KEY>");
     const out = await call("POST", "/admin/license/revoke", { key });
     console.log(`revoked ${out.revoked ?? 0} row(s): ${key}`);
+    break;
+  }
+  case "orders": {
+    const out = await call("GET", "/admin/license/order/list");
+    const rows = out.orders ?? [];
+    if (!rows.length) console.log("(none)");
+    for (const r of rows) {
+      const when = r.created_at
+        ? new Date(r.created_at * 1000).toISOString().slice(0, 16).replace("T", " ")
+        : "?";
+      console.log(
+        `${r.code}  ${when}  ${String(r.amount).padStart(7)}đ  ${r.status.padEnd(8)}${
+          r.key ? `  ${r.key}` : ""
+        }`,
+      );
+    }
+    break;
+  }
+  case "order-paid": {
+    const code = positional[0];
+    if (!code) throw new Error("usage: order-paid <TIOxxxxxx>");
+    const out = await call("POST", "/admin/license/order/paid", { code });
+    console.log(
+      out.already ? `already paid: ${out.key}` : `marked paid, minted key: ${out.key}`,
+    );
     break;
   }
   default:

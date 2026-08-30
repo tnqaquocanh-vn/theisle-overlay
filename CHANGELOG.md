@@ -4,6 +4,35 @@ Mọi thay đổi đáng chú ý của TheIsle Overlay được ghi tại đây,
 [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và đánh số phiên bản
 [SemVer](https://semver.org/lang/vi/). Mã trong ngoặc là commit tương ứng.
 
+## [1.32.0] — 2026-08-30
+
+### Thêm
+
+- **Mua mã ngay trong app (chuyển khoản Việt Nam, tự động).** Cài đặt → Người
+  ủng hộ → **💳 Mua mã**: app xin máy chủ một *mã đơn*, hiện **QR VietQR** (nội
+  dung chuyển khoản = mã đơn), rồi tự hỏi máy chủ tới khi webhook **SePay** báo
+  đã nhận tiền → tự mint mã + tự kích hoạt. Không copy/paste gì.
+  - Đơn hết hạn sau 30 phút; có nút Huỷ / Tạo đơn mới; đếm ngược thời gian.
+  - Có nút chép nhanh số TK + nội dung để chuyển tay nếu không quét QR được.
+  - Máy chủ chưa cấu hình ngân hàng → nút hiện thông báo nhẹ, không lỗi.
+- Cứu hộ thủ công: `npm run license -- order-paid TIOxxxxxx` (khách đã trả nhưng
+  webhook không về — sai nội dung, thiếu tiền, SePay lỗi). `npm run license --
+  orders` xem 100 đơn gần nhất.
+
+### Kỹ thuật
+
+- Worker: bảng `license_order` (`0003_orders.sql`); route `POST /v1/license/
+  order/new`, `GET /v1/license/order/{code}?fp=`, webhook `POST /v1/license/
+  sepay` (auth `Authorization: Apikey <SEPAY_API_KEY>`), admin `POST /admin/
+  license/order/paid` + `GET /admin/license/order/list`. Biến môi trường
+  `PRICE_VND` / `ORDER_TTL_MIN` / `BANK_BIN` / `BANK_ACCOUNT` / `BANK_NAME` +
+  secret `SEPAY_API_KEY`. Cron dọn đơn quá hạn.
+- Rust: `license::order_new` / `order_poll` (gắn `fp` — chỉ máy mở đơn mới nhận
+  được mã); lệnh `license_order_new` / `license_order_poll`.
+- Frontend: `SupporterCard.svelte` thêm luồng mua (state machine + poll 5 giây),
+  `api.ts` `LicenseOrder` / `licenseOrderNew` / `licenseOrderPoll`, i18n
+  `sup.buy_*`.
+
 ## [1.31.1] — 2026-08-30
 
 ### Sửa

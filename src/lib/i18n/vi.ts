@@ -616,6 +616,26 @@ export const vi = {
     "hoặc liên hệ để được hỗ trợ.",
   "sup.err_bad": "Mã sai định dạng. Dạng đúng: BUMBUM-XXXX-XXXX-XXXX.",
   "sup.err_network": "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.",
+  "sup.buy_btn": "💳 Mua mã — QR ngân hàng (Việt Nam)",
+  "sup.buy_creating": "Đang tạo đơn…",
+  "sup.buy_scan": "Quét QR bằng app ngân hàng, hoặc chuyển khoản thủ công:",
+  "sup.buy_amount": "Số tiền",
+  "sup.buy_bank": "Ngân hàng / Số TK",
+  "sup.buy_memo": "Nội dung chuyển khoản",
+  "sup.buy_memo_warn":
+    "Ghi ĐÚNG nội dung này. Sai nội dung thì mã sẽ không tự về máy bạn (vẫn cứu được thủ công, nhưng lâu hơn).",
+  "sup.buy_waiting": "Đang chờ xác nhận thanh toán tự động…",
+  "sup.buy_expires": "Hết hạn sau {t}",
+  "sup.buy_expired": "Đơn đã hết hạn. Tạo đơn mới để lấy mã QR khác.",
+  "sup.buy_new": "Tạo đơn mới",
+  "sup.buy_cancel": "Huỷ đơn",
+  "sup.buy_activating": "Đã nhận thanh toán — đang kích hoạt…",
+  "sup.buy_err": "Không tạo được đơn. Thử lại sau ít phút.",
+  "sup.buy_unconfigured":
+    "Thanh toán tự động chưa được bật. Dùng nút \"Lấy mã ủng hộ\" bên dưới, hoặc liên hệ trực tiếp để nhận mã.",
+  "sup.buy_copy": "Chép",
+  "sup.buy_copied": "Đã chép",
+  "sup.buy_qr_alt": "Mã QR chuyển khoản VietQR",
 
   // --- số liệu sử dụng & phản hồi ---
   "telemetry.title": "Số liệu sử dụng & phản hồi",

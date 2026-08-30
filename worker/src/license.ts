@@ -120,9 +120,161 @@ async function kofi(req: Request, env: Env): Promise<Response> {
   return new Response("ok");
 }
 
+// ------------------------------------------------ in-app "Mua mã" order ---
+//
+// The app opens an order, shows a VietQR whose transfer memo IS the order
+// code, then polls GET /v1/license/order/<code> until SePay's webhook marks it
+// paid and attaches a freshly minted key. No copy/paste for the buyer.
+
+const ORDER_CODE_RE = /TIO[A-Z0-9]{6}/i;
+const ORDER_CODE_EXACT = /^TIO[A-Z0-9]{6}$/;
+
+const priceVnd = (env: Env) => {
+  const n = parseInt(env.PRICE_VND ?? "50000", 10);
+  return Number.isFinite(n) && n > 0 ? n : 50000;
+};
+const orderTtlMin = (env: Env) => {
+  const n = parseInt(env.ORDER_TTL_MIN ?? "", 10);
+  return Number.isFinite(n) && n > 0 ? n : 30;
+};
+const bankConfigured = (env: Env) => Boolean(env.BANK_BIN && env.BANK_ACCOUNT);
+
+function randOrderCode(): string {
+  const A = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  const buf = new Uint8Array(6);
+  crypto.getRandomValues(buf);
+  return "TIO" + [...buf].map((b) => A[b % A.length]).join("");
+}
+
+function vietQrUrl(env: Env, amount: number, addInfo: string): string {
+  const bin = encodeURIComponent(env.BANK_BIN ?? "");
+  const acct = encodeURIComponent(env.BANK_ACCOUNT ?? "");
+  const name = encodeURIComponent(env.BANK_NAME ?? "");
+  return (
+    `https://img.vietqr.io/image/${bin}-${acct}-compact2.png` +
+    `?amount=${amount}&addInfo=${encodeURIComponent(addInfo)}&accountName=${name}`
+  );
+}
+
+async function orderNew(req: Request, env: Env): Promise<Response> {
+  if (!bankConfigured(env)) return json({ error: "not_configured" }, 503);
+  const ip = req.headers.get("cf-connecting-ip") ?? "x";
+  if (!(await env.RL_WRITE.limit({ key: `order:${ip}` })).success) {
+    return json({ error: "rate" }, 429);
+  }
+  let fp: string | null = null;
+  try {
+    fp = str((await req.json() as Record<string, unknown>).fp, FP_MAX);
+  } catch {
+    /* fp is optional */
+  }
+  const amount = priceVnd(env);
+  let code = "";
+  for (let i = 0; i < 5 && !code; i++) {
+    const c = randOrderCode();
+    try {
+      await env.DB.prepare(
+        `INSERT INTO license_order (code, amount, fp, created_at) VALUES (?, ?, ?, ?)`,
+      )
+        .bind(c, amount, fp, nowS())
+        .run();
+      code = c;
+    } catch {
+      /* PK collision — retry */
+    }
+  }
+  if (!code) return json({ error: "server" }, 500);
+  return json({
+    code,
+    amount,
+    addInfo: code,
+    ttlMin: orderTtlMin(env),
+    bank: { bin: env.BANK_BIN, account: env.BANK_ACCOUNT, name: env.BANK_NAME ?? "" },
+    qrUrl: vietQrUrl(env, amount, code),
+  });
+}
+
+async function orderStatus(req: Request, env: Env, raw: string): Promise<Response> {
+  const code = raw.toUpperCase();
+  if (!ORDER_CODE_EXACT.test(code)) return json({ status: "unknown", key: null }, 400);
+  const row = (await env.DB.prepare(
+    `SELECT status, key, fp, created_at FROM license_order WHERE code = ?`,
+  )
+    .bind(code)
+    .first()) as
+    | { status: string; key: string | null; fp: string | null; created_at: number }
+    | null;
+  if (!row) return json({ status: "unknown", key: null });
+  if (row.status === "pending" && nowS() - row.created_at > orderTtlMin(env) * 60) {
+    await env.DB.prepare(
+      `UPDATE license_order SET status = 'expired' WHERE code = ? AND status = 'pending'`,
+    )
+      .bind(code)
+      .run();
+    return json({ status: "expired", key: null });
+  }
+  if (row.status === "paid") {
+    // Hand the key back only to the machine that opened the order.
+    const fp = new URL(req.url).searchParams.get("fp");
+    if (row.fp && fp && row.fp !== fp) return json({ status: "paid", key: null });
+    return json({ status: "paid", key: row.key });
+  }
+  return json({ status: row.status, key: null });
+}
+
+// SePay (sepay.vn) webhook: fires when money lands in the linked bank account.
+// Auth header is `Authorization: Apikey <SEPAY_API_KEY>`.
+async function sepay(req: Request, env: Env): Promise<Response> {
+  const auth = req.headers.get("authorization") ?? "";
+  if (!env.SEPAY_API_KEY || !timingSafeEqual(auth, `Apikey ${env.SEPAY_API_KEY}`)) {
+    return new Response("ok"); // ignore spoofed calls silently
+  }
+  let d: Record<string, unknown>;
+  try {
+    d = (await req.json()) as Record<string, unknown>;
+  } catch {
+    return new Response("ok");
+  }
+  if (String(d.transferType ?? d.transfer_type ?? "in") !== "in") return new Response("ok");
+  const content = `${d.content ?? ""} ${d.description ?? ""}`;
+  const m = content.match(ORDER_CODE_RE);
+  if (!m) return new Response("ok");
+  const code = m[0].toUpperCase();
+  const amount = Math.round(Number(d.transferAmount ?? d.transfer_amount ?? 0));
+  const ref = str(d.referenceCode ?? d.reference_code ?? d.id, 64);
+
+  const order = (await env.DB.prepare(
+    `SELECT amount, status FROM license_order WHERE code = ?`,
+  )
+    .bind(code)
+    .first()) as { amount: number; status: string } | null;
+  if (!order || order.status !== "pending") return new Response("ok");
+  if (amount < order.amount) return new Response("ok"); // underpaid — leave for manual rescue
+
+  const key = randKey();
+  await env.DB.prepare(
+    `INSERT INTO license (key, tier, issued_at, source, note)
+     VALUES (?, 'supporter', ?, 'sepay', ?)`,
+  )
+    .bind(key, nowS(), `order ${code} ${amount}`)
+    .run();
+  await env.DB.prepare(
+    `UPDATE license_order SET status = 'paid', key = ?, paid_at = ?, paid_ref = ?, paid_amount = ?
+     WHERE code = ? AND status = 'pending'`,
+  )
+    .bind(key, nowS(), ref, amount, code)
+    .run();
+  return new Response("ok");
+}
+
 export function handleLicense(req: Request, env: Env, path: string): Promise<Response> {
   if (req.method === "POST" && path === "/v1/license/validate") return validate(req, env);
   if (req.method === "POST" && path === "/v1/license/kofi") return kofi(req, env);
+  if (req.method === "POST" && path === "/v1/license/sepay") return sepay(req, env);
+  if (req.method === "POST" && path === "/v1/license/order/new") return orderNew(req, env);
+  if (req.method === "GET" && path.startsWith("/v1/license/order/")) {
+    return orderStatus(req, env, path.slice("/v1/license/order/".length));
+  }
   return Promise.resolve(new Response(null, { status: 404 }));
 }
 
@@ -197,6 +349,42 @@ export async function handleLicenseAdmin(
       .bind(...bind)
       .all();
     return json({ licenses: res.results ?? [] });
+  }
+
+  // Manual rescue: buyer paid but the SePay webhook never landed (wrong memo,
+  // underpaid, SePay outage). Mints a key and marks the order paid.
+  if (req.method === "POST" && path === "/admin/license/order/paid") {
+    const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+    const code = (str(b.code, 12) ?? "").toUpperCase();
+    if (!ORDER_CODE_EXACT.test(code)) return json({ error: "bad_code" }, 400);
+    const order = (await env.DB.prepare(
+      `SELECT status, key FROM license_order WHERE code = ?`,
+    )
+      .bind(code)
+      .first()) as { status: string; key: string | null } | null;
+    if (!order) return json({ error: "unknown" }, 404);
+    if (order.status === "paid") return json({ ok: true, key: order.key, already: true });
+    const key = randKey();
+    await env.DB.prepare(
+      `INSERT INTO license (key, tier, issued_at, source, note)
+       VALUES (?, 'supporter', ?, 'manual', ?)`,
+    )
+      .bind(key, nowS(), `order-paid ${code}`)
+      .run();
+    await env.DB.prepare(
+      `UPDATE license_order SET status = 'paid', key = ?, paid_at = ? WHERE code = ?`,
+    )
+      .bind(key, nowS(), code)
+      .run();
+    return json({ ok: true, key });
+  }
+
+  if (req.method === "GET" && path === "/admin/license/order/list") {
+    const res = await env.DB.prepare(
+      `SELECT code, amount, status, key, created_at, paid_at, paid_amount
+       FROM license_order ORDER BY created_at DESC LIMIT 100`,
+    ).all();
+    return json({ orders: res.results ?? [] });
   }
 
   return json({ error: "not_found" }, 404);

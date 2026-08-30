@@ -158,6 +158,8 @@ pub fn run(replay_file: Option<PathBuf>) {
             commands::license_activate,
             commands::license_refresh,
             commands::license_clear,
+            commands::license_order_new,
+            commands::license_order_poll,
             commands::localpos_status,
             commands::copy_map_snapshot,
             bigmap::toggle_bigmap,

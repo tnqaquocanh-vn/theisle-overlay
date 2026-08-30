@@ -105,6 +105,12 @@ export async function runCron(env: Env): Promise<void> {
     env.DB.prepare(`DELETE FROM device WHERE last_day < ?1`).bind(today - DEVICE_RETENTION_DAYS),
     env.DB.prepare(`DELETE FROM crash_agg WHERE utc_day < ?1`).bind(today - DEVICE_RETENTION_DAYS),
     env.DB.prepare(`DELETE FROM feedback WHERE utc_day < ?1`).bind(today - FEEDBACK_RETENTION_DAYS),
+    // Drop abandoned "Mua mã" orders after a week; keep paid ones (a receipt)
+    // for six months.
+    env.DB.prepare(
+      `DELETE FROM license_order
+       WHERE (status != 'paid' AND created_at < ?1) OR (status = 'paid' AND created_at < ?2)`,
+    ).bind(nowS() - 7 * 86400, nowS() - 180 * 86400),
   );
 
   await env.DB.batch(stmts);
