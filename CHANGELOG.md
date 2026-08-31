@@ -10,6 +10,16 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.38.3] — 2026-08-31
+
+### Sửa
+
+- **Park dino giờ chạy đúng.** Server mất 1–2 phút mới đưa dino vào garage
+  (không phải 30 giây), nên bản trước hay báo "huỷ" oan dù park đã thành công.
+  App giờ gửi lệnh rồi tự theo dõi tới khi dino vào garage mới báo — nút Park
+  hiện "Đang park…" trong lúc chờ. Nhớ đứng yên trong game, di chuyển hay bị
+  đánh lúc đếm ngược sẽ làm huỷ lệnh.
+
 ## [1.38.2] — 2026-08-31
 
 ### Thêm
