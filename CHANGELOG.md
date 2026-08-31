@@ -10,6 +10,21 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.38.0] — 2026-08-31
+
+### Đổi
+
+- **Đổi máy hay chơi qua máy cloud vẫn giữ được mã.** Mã bản quyền giờ gắn với
+  tài khoản Steam đang đăng nhập (chỉ gửi một mã băm, không gửi thông tin
+  Steam) — cài lại máy, đổi PC hay thuê máy cloud khác thì bấm "Đã mua trên máy
+  này nhưng mất mã?" là lấy lại được, không cần nhập lại chuỗi mã.
+- **Giới hạn số máy dùng cùng lúc thay cho giới hạn số lần đổi máy.** Một máy
+  lâu không dùng sẽ tự nhả chỗ sau 14 ngày, nên đổi máy thường xuyên không còn
+  bị chặn. Mã vẫn chỉ cho một vài máy hoạt động song song.
+- Nếu bạn đang kẹt vì mua trên máy cloud: mở app, đăng nhập Steam như bình
+  thường rồi bấm "Đã mua trên máy này nhưng mất mã?" một lần — từ đó về sau mã
+  đi theo tài khoản Steam của bạn.
+
 ## [1.37.2] — 2026-08-31
 
 ### Thêm
