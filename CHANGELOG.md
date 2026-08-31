@@ -10,6 +10,25 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.38.2] — 2026-08-31
+
+### Thêm
+
+- **Ô dán mã skin trong tab Skin.** Dán thẳng chuỗi skin định dạng game (chuỗi
+  Import trong game) hoặc mã app `tio-skin:` vào ô rồi bấm Nhập mã — màu nạp vào
+  trình chỉnh, sau đó bấm "Áp dụng vào game" như thường.
+
+### Sửa
+
+- **Park dino (tab Garage) giờ báo đúng.** Park có đếm ngược ~30 giây phía server:
+  app sẽ nhắc bạn đứng yên trong game, đợi hết đếm ngược rồi tự kiểm tra lại. Nếu
+  bạn di chuyển hay bị tấn công làm huỷ lệnh, app báo rõ thay vì lặng thinh.
+  (Bản sửa ở 1.38.1 chưa đúng.)
+- **Áp skin báo rõ hơn khi không đẩy được vào game.** Nếu bạn đã tắt "Cập nhật
+  thời gian thực (WebSocket)" ở tab Khủng long thì app nói thẳng cần bật lại, thay
+  vì hứa "sẽ tự áp khi vào lại" (mà không bao giờ áp). Log cũng ghi lại lý do
+  socket rớt để dễ tìm nguyên nhân khi có người báo lỗi.
+
 ## [1.38.1] — 2026-08-31
 
 ### Thêm
