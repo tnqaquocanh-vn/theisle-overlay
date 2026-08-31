@@ -10,6 +10,21 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.38.1] — 2026-08-31
+
+### Thêm
+
+- **Chỉnh riêng cỡ từng bảng dưới bản đồ nhỏ.** Cài đặt → Bản đồ nhỏ có thêm
+  "Cỡ bảng chỉ số khủng long" và "Cỡ bảng nhiệm vụ Prime" — phóng to/thu nhỏ
+  từng bảng mà không đụng tới đĩa bản đồ hay bảng còn lại.
+
+### Sửa
+
+- **Nút gửi phản hồi giờ hoạt động** kể cả khi tắt "Gửi số liệu sử dụng" —
+  góp ý/báo lỗi của bạn đến thẳng nhà phát triển.
+- **Park khủng long (tab Garage)** không dùng được với bản IslePilot mới —
+  đã sửa để tự qua bước xác nhận.
+
 ## [1.38.0] — 2026-08-31
 
 ### Đổi
