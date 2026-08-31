@@ -10,6 +10,24 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.39.0] — 2026-08-31
+
+### Thêm
+
+- **Nhãn loài + cân nặng trên bản đồ (PRO VIP).** Chấm đồng đội hiện nhãn gọn
+  kiểu "T-Rex 12T", "Cera 800Kg" — cân nặng lấy từ chỉ số thật của họ (kể cả
+  Prime Elder). Chấm còn đổi màu theo quan hệ với khủng long của bạn: cùng loài
+  (xanh lá), ăn thịt (đỏ), ăn cỏ (xanh dương), AI (vàng). Bật ở Cài đặt → Bản đồ.
+  Đồng đội cần cập nhật bản này để gửi dữ liệu.
+- **Hai mức ủng hộ: PRO (30.000đ) và PRO VIP (50.000đ).** PRO gồm mọi tính năng
+  nâng cao như trước. PRO VIP thêm nhãn loài+cân nặng trên bản đồ (và tính năng
+  bản đồ nâng cao sắp tới). Đang là PRO thì có nút nâng lên PRO VIP, chỉ trả
+  phần chênh 20.000đ.
+
+### Đổi
+
+- Người đã ủng hộ từ trước tự động thành **PRO** — không mất quyền gì.
+
 ## [1.38.3] — 2026-08-31
 
 ### Sửa
