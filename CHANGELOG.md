@@ -10,6 +10,14 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.39.1] — 2026-09-01
+
+### Đổi
+
+- **Bản bảo trì.** Cửa sổ chính khởi động nhẹ hơn một chút. Phần còn lại là
+  cải thiện nội bộ và chuẩn bị nền cho các bản cập nhật bản đồ sắp tới —
+  không có thay đổi đáng kể với người dùng.
+
 ## [1.39.0] — 2026-08-31
 
 ### Thêm
