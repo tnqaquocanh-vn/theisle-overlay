@@ -10,6 +10,34 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.41.0] — 2026-09-02
+
+### Đổi
+
+- **Chấm vị trí đồng đội & người chơi khác** trên bản đồ nhỏ và bản đồ lớn
+  đổi sang kiểu chấm tròn phát sáng giống Google/Apple Maps, mượt hơn.
+  Đồng đội tụt dưới 25% máu thì chấm to lên kèm vòng cảnh báo.
+
+### Sửa
+
+- **Cân nặng trên nhãn đồng đội/người chơi:** không còn đoán bừa một con số
+  khi bên kia chưa gửi đủ chỉ số — lúc đó chỉ hiện tên loài.
+- **Thanh chỉ số đồng đội trên bản đồ nhỏ nhẹ hơn nhiều trên máy yếu** — vẽ
+  gọn lại, chỉ cập nhật khi có thay đổi thấy được, và giới hạn 10 dòng (đầu
+  bảng vẫn ghi đúng sĩ số). Trước đây bật thanh này lên là máy yếu bị giật.
+- **Ở chung nhóm/máy yếu đỡ giật hơn** — chấm đồng đội chỉ vẽ lại khi thật
+  sự có dịch chuyển; ở Chế độ nhẹ chấm nhảy thẳng (không trượt) và chỉ hiện
+  ~12 chấm gần nhất khi cả nhóm đứng chồng lên nhau.
+
+### Nội bộ
+
+- Overlay: cache cửa sổ game + thêm bộ đo hiệu năng (bật bằng
+  `debug.perf_probe`) để lấy số CPU thật từ người dùng — R-02 (C-1/C-2).
+- Bản đồ nhỏ: bỏ qua `party://update` không dịch chuyển (chữ ký bucket);
+  Chế độ nhẹ bỏ vòng repaint mỗi frame của chấm party + cap 12 chấm gần
+  nhất; thanh chỉ số đội tô phẳng + throttle ≤5 Hz + cap 10 dòng (khớp
+  Rust). R-18 / R-19.
+
 ## [1.40.1] — 2026-09-02
 
 ### Sửa
