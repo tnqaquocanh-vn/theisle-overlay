@@ -10,6 +10,22 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.40.1] — 2026-09-02
+
+### Sửa
+
+- **Nhóm sinh tồn:** khi không vào/tạo được nhóm, app báo lý do rõ ràng thay
+  vì dòng lỗi khó hiểu, và tự sửa địa chỉ relay nếu bạn nhập thiếu
+  `https://`. Thêm nút chép mã nhóm cho tiện.
+- **Cửa sổ ứng dụng đỡ giật khi chuyển tab** — các tab được nạp sẵn lúc máy
+  rảnh, và mở lại mục Cài đặt không còn khựng.
+
+### Đổi
+
+- **Viết lại toàn bộ phần Hướng dẫn trong app** — chia 13 mục có mục lục,
+  chi tiết hơn hẳn và phủ đủ mọi tính năng (Garage, Skin, Companion, xem lại
+  hành trình, Npcap, gói PRO/PRO VIP…).
+
 ## [1.40.0] — 2026-09-02
 
 ### Thêm
