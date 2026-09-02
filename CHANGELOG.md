@@ -10,6 +10,27 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [1.40.0] — 2026-09-02
+
+### Thêm
+
+- **Tự cài Npcap.** Bật "Vị trí tự động" mà máy chưa có Npcap thì app hỏi và
+  cài luôn cho bạn (qua winget, hoặc tải bản cài chính chủ đã ký từ
+  npcap.com) — không phải tự đi tìm và cài tay nữa.
+
+### Đổi
+
+- **Màn Cài đặt gọn hơn hẳn.** Chia thành các tab bên trái, thêm ô tìm kiếm,
+  và gom những tuỳ chọn nâng cao của bản đồ nhỏ vào một mục thu gọn.
+- **PRO và PRO VIP rõ ràng hơn.** Mục Tài khoản có bảng so sánh Free / PRO /
+  PRO VIP, và mọi tính năng bị khoá giờ dùng chung một nhãn bấm được để mở
+  thẳng chỗ nâng hạng.
+
+### Sửa
+
+- **Park dino.** Trước đây bấm Park xong đợi mãi không cất được; giờ chạy đúng
+  như bên web.
+
 ## [1.39.1] — 2026-09-01
 
 ### Đổi
