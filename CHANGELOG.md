@@ -10,6 +10,57 @@ nội dung hiện trong mục "Có gì mới" của app. Chi tiết kỹ thuật
 message. Nếu cần ghi chú nội bộ trong file này, đặt dưới mục `### Nội bộ` — CI
 tự cắt phần đó khỏi thông báo người dùng thấy.
 
+## [Chưa phát hành]
+
+## [1.41.1] — 2026-09-03
+
+### Thêm
+
+- **Ô chú thích màu chấm trên bản đồ lớn** — góc trên-trái liệt kê ý nghĩa
+  các màu chấm người chơi (cùng loài / ăn thịt / ăn cỏ / ăn tạp / AI / chưa
+  rõ). Chỉ hiện khi chấm đang tô màu theo quan hệ; bấm ✕ để ẩn.
+
+### Sửa
+
+- **Cửa sổ đăng nhập Steam (tab Khủng long) không hiện ra** — có máy mở cửa
+  sổ đăng nhập bị khuất hẳn sau cửa sổ chính nên trông như bấm nút mà không
+  có gì. Giờ cửa sổ luôn canh giữa màn hình và nổi lên trên; nếu vẫn không
+  mở được thì ô "dán token thủ công" tự bung ra để có đường khác.
+- **Xoay bản đồ nhỏ theo hướng đi mượt đều hơn** trên máy chạy dưới 60 hình/giây
+  — hiệu ứng xoay giờ tính theo thời gian thực nên tốc độ ổn định giữa các
+  máy (Chế độ nhẹ vẫn xoay tức thì như cũ).
+- **Nhãn tên đồng đội & tên loài trên bản đồ dễ đọc hơn** — chữ trắng viền
+  đen đậm, to hơn một chút, chấm vị trí cũng nhỉnh hơn. Màu quan hệ/máu vẫn
+  nằm ở lõi chấm.
+- **Nút tắt “Tự ghim Vị trí cuối khi chết” dễ tìm hơn** — đổi tên nút cho rõ
+  (nó vốn đã có trong Cài đặt › Bản đồ nhỏ), thêm mô tả và cho tìm được bằng
+  ô tìm kiếm. Vẫn bật sẵn; ai thấy phiền thì tắt.
+
+### Nội bộ
+
+- Bản đồ lớn: bỏ qua `party://update` không làm đổi chấm/nhãn nào (chữ ký
+  bucket) — hoàn tất R-18 phía client.
+- **R-03 / PF-3** (renderer minimap, sau cờ `gpu_layers` mặc định TẮT):
+  - `headingEaseK` (exp-smoothing theo frame gap) thay hệ số ease cố định
+    0.35, có unit test.
+  - `drawMap` tách `drawGroundLayer` / `drawTrailLayer` / `drawContactsLayer`
+    (chung `MapFrame`, cùng thứ tự, byte-identical). `drawBasemap` tách
+    `ensureMarginCrop`.
+  - **PF-3.3:** ảnh nền basemap chạy trên canvas riêng, pan bằng CSS
+    transform (không vẽ lại 2D). Fresh-water + bench canvas rơi về đường cũ;
+    lỗi thì latch tắt cả phiên.
+  - **PF-3.4:** heading-up — lớp ground xoay bằng CSS `rotate(-heading)` quanh
+    vị trí người chơi; trail/marker/chrome trên canvas phủ xoay cùng chiều
+    trong ctx 2D. Một cú xoay giờ là xoay GPU lớp basemap, không re-crop.
+  - **PF-3.5:** khi map đang di chuyển, bỏ vẽ vignette trên canvas phủ (fill
+    radial-gradient — thao tác nặng nhất còn lại mỗi frame); hiện lại ngay
+    khi đứng yên.
+  - Cờ TẮT = byte-identical (9 ảnh minimap không đổi); specs mới
+    `minimap-map-layers`, `minimap-gpu-layers`, `minimap-gpu-layers-headingup`;
+    hook `window.__emit` trong tauri-mock. Còn: review ≤2%/pixel định lượng
+    trên build thật (mipmap basemap bỏ — ít tác dụng ở mức zoom thực; crop
+    trong Worker để sau).
+
 ## [1.41.0] — 2026-09-02
 
 ### Đổi
