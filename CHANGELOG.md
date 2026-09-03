@@ -12,6 +12,33 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.42.0] — 2026-09-03
+
+### Thêm
+
+- **Đột biến (Mutations) + giới tính trong tab Garage** — mỗi khủng long đã
+  park giờ hiện giới tính, và nút **Đột biến (N)** mở danh sách các đột biến
+  của con đó — giống mục Mutations trên web IslePilot.
+
+### Sửa
+
+- **Đồng đội bị vẽ 2 chấm chồng lên nhau** — người vừa trong nhóm sinh tồn
+  vừa dùng app hiện cả chấm đồng đội lẫn chấm "người lạ" ở cùng vị trí, 2 nhãn
+  đè lên nhau. Giờ chấm "người lạ" bỏ qua ai đang là đồng đội của bạn (khớp
+  theo vị trí + loài), trên cả bản đồ lớn và bản đồ nhỏ.
+- **Nhãn đồng đội mất cân nặng sau khi park/khôi phục ở gara** — khi đồng đội
+  cất khủng long vào gara rồi khôi phục lại, IslePilot tạm thời không gửi
+  growth/maxHealth nên nhãn của họ mất phần cân nặng. Giờ app giữ giá trị cân
+  nặng gần nhất của từng đồng đội cho tới khi có số mới.
+
+### Nội bộ
+
+- `check-versions.ps1` kiểm luôn parity phiên bản Tauri giữa npm
+  (`@tauri-apps/plugin-*`) và Rust (`tauri-plugin-*`) — chặn kiểu lệch làm
+  hỏng build release ngay ở bước `check`.
+- Bóc cụm lệnh IPC IslePilot/garage/skin ra `commands/islepilot.rs`
+  (R-09, Vòng 3 V-08). Không đổi hành vi.
+
 ## [1.41.2] — 2026-09-03
 
 ### Thêm
