@@ -12,6 +12,40 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.41.2] — 2026-09-03
+
+### Thêm
+
+- **Cảm nhận hệ sinh thái quanh bạn** — bản đồ lớn và bản đồ nhỏ điểm thêm
+  những sinh vật do người lạ khác ghi nhận gần vị trí của bạn (loài + kích
+  cỡ, cùng máy chủ). Một chút thông tin để chuyến đi săn bớt bất ngờ. Dành
+  cho gói PRO VIP; bật trong *Cài đặt › Nhãn người chơi trên bản đồ*.
+- **Hộp "Có gì mới" nổi bật sau khi cập nhật** — từ bản kế tiếp trở đi, mỗi
+  lần ứng dụng tự cập nhật xong sẽ hiện ngay một hộp tóm tắt thay đổi ở giữa
+  màn hình, thay vì nằm khuất trong mục xổ xuống.
+
+### Sửa
+
+- **Minimap giật và "Áp dụng skin vào game" không ăn trên một số server** — kết
+  nối thời gian thực tới IslePilot bị máy chủ trả lỗi 429 ("quá nhiều yêu cầu")
+  rồi ứng dụng thử lại liên tục mỗi 1–3 giây, khiến vị trí chỉ còn cập nhật
+  theo vòng chậm (giật) và lệnh áp skin bị xoá trước khi kịp gửi. Giờ khi gặp
+  429, ứng dụng nghỉ hẳn 30–180 giây (theo yêu cầu của máy chủ nếu có) thay vì
+  dồn dập; lệnh áp skin được giữ ~20 giây nên không mất khi kết nối chập chờn;
+  và chặn không cho nhiều luồng kết nối chồng lên nhau.
+- **Nói rõ khi server chưa cấp vị trí cho overlay** — vào một số server (dù
+  trang web server vẫn có bản đồ), overlay không nhận được vị trí qua IslePilot
+  nên minimap đứng yên và nút "Áp dụng skin vào game" bấm như không có gì. Giờ
+  app báo thẳng lý do và chỉ cách khắc phục: bật *Vị trí tự động (Npcap)* trong
+  Cài đặt để minimap chạy trên server đó; áp skin trực tiếp thì cần server có hỗ
+  trợ.
+
+### Nội bộ
+
+- Nâng TypeScript 5.9 → 6.0 (app + worker). Bỏ `baseUrl` khỏi `tsconfig.json`
+  (6.0 báo lỗi phế; 7.0 xoá hẳn), `paths` chuyển sang đường dẫn tương đối.
+  Chưa lên 7.0 vì `svelte-check` chưa hỗ trợ. Toàn bộ gate xanh.
+
 ## [1.41.1] — 2026-09-03
 
 ### Thêm
