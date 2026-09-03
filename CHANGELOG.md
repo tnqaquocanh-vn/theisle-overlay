@@ -12,6 +12,72 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.43.0] — 2026-09-04
+
+### Thêm
+
+- **Tab Việt hoá (PRO trở lên)** — việt hoá giao diện The Isle ngay trong game
+  chỉ bằng một chạm: tự dò thư mục game, tải gói dịch, bật tiếng Việt. Chỉ
+  **thêm** file dữ liệu ngôn ngữ — không sửa/xoá file gốc, không đụng
+  Paks/Binaries/EAC — và về tiếng Anh gốc bất cứ lúc nào. Gói hiện phủ gần như
+  toàn bộ giao diện: menu, cài đặt (đồ hoạ/âm thanh/điều khiển + tên phím),
+  duyệt máy chủ, tạo phòng, chọn phe, tổ, HUD, chat, mod, bảng quản trị, thông
+  báo lỗi. Có nút **cập nhật nổi bật** khi có bản dịch mới; tự nhắc khi game
+  vừa patch.
+- **Bảng đột biến tiếng Việt trong tab Khủng long** — mỗi đột biến (mutation)
+  của con bạn đang chơi hiện một dòng gọn: mũi tên ▲ lợi / ▼ giảm hao / ⇅ đánh
+  đổi / ● tuỳ lúc, thẻ chỉ số (Máu, Thể lực, Sát thương…), điều kiện (ban đêm,
+  khi mưa…) và một câu giải nghĩa ngắn — nhìn một giây là hiểu tăng/giảm gì.
+  Kèm nút **"Tất cả đột biến"** liệt kê cả 41 đột biến theo nhóm. Tên đột biến
+  giữ nguyên tiếng Anh.
+- **Chế độ tài nguyên thấp** (Cài đặt → Tối ưu, mặc định tắt) — giảm nhịp
+  giám sát của minimap/BigMap khi cửa sổ đang ẩn, BigMap tạm dừng xử lý cho
+  tới khi mở lại, và khi bản đồ đang hiện thì gom truy vấn + giới hạn vẽ lại
+  quanh 24 FPS. Kèm tuỳ chọn **cập nhật đường đi dạng delta** (thử nghiệm).
+  Tắt → mọi thứ chạy y như trước.
+- **Khoá màu từng kênh trong tab Skin** — mỗi kênh màu có nút 🔒; kênh đã khoá
+  sẽ được nút **Ngẫu nhiên** bỏ qua. Trạng thái khoá được nhớ theo bản nháp.
+
+### Sửa
+
+- **Bảng "Có gì mới" bị bản đồ che** — lần đầu mở app sau khi cập nhật, bảng
+  "Có gì mới" hiện phía dưới lớp bản đồ nên gần như không đọc được. Giờ nó
+  luôn nổi lên trên cùng.
+- **Nhãn đồng đội trong nhóm không hiện cân nặng** — relay nhóm (G6) bỏ rơi
+  luôn `growth`/`maxHealth` khi chuyển tiếp, nên mọi đồng đội đều mất phần cân
+  nặng dù overlay của họ bản mới. Đã cho relay chuyển tiếp đủ các trường này.
+  *(Cần deploy lại worker Cloudflare mới có tác dụng.)*
+- **Đồng đội đổi loài (park rồi chọn con khác) — nhãn vẫn giữ cân nặng con
+  cũ** — app "nhớ" cân nặng gần nhất của đồng đội để không bị mất khi dữ liệu
+  gián đoạn, nhưng khi họ đổi hẳn sang loài khác thì phần nhớ đó lại dán cân
+  nặng con cũ lên con mới. Giờ đổi loài sẽ xoá phần nhớ, và chấm "người lạ"
+  trùng vị trí đồng đội luôn bị gộp kể cả khi 2 nguồn dữ liệu tạm lệch loài
+  (hết cảnh 2 chấm chồng nhau lúc đổi dino).
+- **Garage: bỏ mục đột biến** — API overlay của IslePilot không trả về đột biến
+  đã sở hữu của khủng long trong gara (popup "Mutations" trên web lấy từ nguồn
+  khác mà overlay token không truy cập được). Tab Garage giữ **giới tính**.
+
+### Nội bộ
+
+- Garage: xác minh token API `/api/overlay/garage` — `pickableMutations` luôn
+  rỗng, không có trường "đột biến đã sở hữu". Reader vẫn để sẵn (`pickableMutations`
+  + badge `mutationEligible`) cho trường hợp IslePilot bổ sung sau. Log chẩn
+  đoán chuyển thành 1 lần/phiên.
+- `carry_vitals` (sticky cân nặng đồng đội) giờ lưu kèm loài và merge theo
+  từng trường; đổi loài → reset. `dropTeammates` bỏ điều kiện khớp loài, chỉ
+  còn khớp theo khoảng cách (~70 m).
+- Việt hoá: gói `.locres` build từ `loc-src/tools/` (`gather_ftext` +
+  `gather_guidtext` FText widget-blueprint + `gather_stringtables` UStringTable
+  + `engine_pack` cho `InputKeys`/Online). 10 file (Game + Engine + 3 plugin
+  Online), ~1988 key / ~1095 dịch thật, phục vụ từ `/v1/loc/theisle-vi`
+  (gate PRO+). Tên đột biến là `FString` biên dịch trong exe game, không phải
+  `FText` → dịch phía app (`src/lib/mutations-vi.ts`).
+- R-22 chế độ tài nguyên thấp: hai cờ opt-in `performance.low_resource` +
+  `performance.trail_delta`, mặc định tắt và byte-identical khi tắt. Chỉ giảm
+  nhịp supervisor cửa sổ minimap/BigMap + watchdog `webview_mem` khi ẩn —
+  không đụng relay nhóm G6, mesh-pub, hay vòng `realtime` 429/EPOCH. `trail_delta`
+  có resync snapshot ở mọi nhánh lệch.
+
 ## [1.42.0] — 2026-09-03
 
 ### Thêm
