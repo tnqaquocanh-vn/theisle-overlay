@@ -49,6 +49,17 @@ jobs:
       - name: Unit tests (Vitest)
         run: npm run test:unit
 
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+
+      - name: Visual regression specs
+        # Screenshot baselines are per-OS (*-chromium-win32.png), which is why
+        # this runs in the `app` job specifically — it's the only windows-latest
+        # job in the gate. Excludes @logic (perf/behaviour specs, no screenshot
+        # assertions) since those already run cross-platform in e2e-logic below;
+        # running them twice would be redundant, not extra coverage.
+        run: npm run test:visual:screens
+
       - name: i18n drift check
         run: node scripts/check-i18n.mjs
 
