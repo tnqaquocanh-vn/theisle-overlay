@@ -12,6 +12,23 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.44.0] — 2026-09-04
+
+### Thêm
+
+- **Chọn kiểu hiển thị chỉ số (tab Khủng long)** — nút gạt **Số / %** ngay trên
+  khối chỉ số: "Số" giữ dạng "842 / 1000", "%" đổi Máu/Đói/Khát/Thể lực sang
+  "84.2%". Lựa chọn được nhớ và áp cho cả bảng phụ màn hình 2.
+
+### Sửa
+
+- **% trưởng thành hiện một chữ số thập phân** ("73.0%" thay vì "73%") ở tab
+  Khủng long, biểu đồ lịch sử và bảng chỉ số dưới bản đồ nhỏ — trước đây làm
+  tròn nên đứng yên hàng phút dù vẫn đang lớn.
+- **Bảng đột biến (tab Khủng long)** — tên tiếng Anh của mỗi đột biến giờ hiện
+  rõ hơn (chữ to hơn, in đậm, có khung nền) và thẳng hàng bên phải, dễ dò theo
+  tên khi phối hợp trong game.
+
 ## [1.43.0] — 2026-09-04
 
 ### Thêm
