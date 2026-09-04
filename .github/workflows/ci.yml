@@ -1,0 +1,53 @@
+# PUBLIC repo (tnqaquocanh-vn/theisle-overlay) — CI for the private source.
+#
+# Triggered by the private repo's dispatch.yml (workflow_dispatch API) on every
+# push, or by hand:
+#   gh workflow run ci.yml --repo tnqaquocanh-vn/theisle-overlay -f source_ref=<sha>
+#
+# NO pull_request / pull_request_target trigger — this repo takes no code PRs.
+
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: "Commit SHA in theisle-overlay-src to check"
+        required: false
+        type: string
+        default: ""
+
+concurrency:
+  group: ci-${{ github.event.inputs.source_ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    uses: ./.github/workflows/gate.yml
+    secrets: inherit
+    with:
+      source_ref: ${{ github.event.inputs.source_ref }}
+
+  # Screenshot regression only. Machine-specific baselines -> reports, never
+  # fails (continue-on-error), same as before.
+  visual:
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - name: Check out the private source
+        uses: actions/checkout@v5
+        with:
+          repository: tnqaquocanh-vn/theisle-overlay-src
+          ref: ${{ github.event.inputs.source_ref }}
+          token: ${{ secrets.SRC_READ_PAT }}
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+      - name: Screenshot specs
+        run: npm run test:visual:screens

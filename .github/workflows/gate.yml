@@ -1,0 +1,127 @@
+# PUBLIC repo (tnqaquocanh-vn/theisle-overlay) — reusable gate.
+#
+# Identical checks to the old private-repo gate; the only addition is the first
+# step: check out the PRIVATE source at `source_ref` via SRC_READ_PAT. Called by
+# ci.yml (branch pushes) and release.yml (tags) with `secrets: inherit`.
+
+on:
+  workflow_call:
+    inputs:
+      source_ref:
+        description: "Commit SHA or tag in theisle-overlay-src to check out. Empty = its default branch."
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  app:
+    runs-on: windows-latest
+    env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}\target
+    steps:
+      - name: Check out the private source
+        uses: actions/checkout@v5
+        with:
+          repository: tnqaquocanh-vn/theisle-overlay-src
+          ref: ${{ inputs.source_ref }}
+          token: ${{ secrets.SRC_READ_PAT }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Svelte/TypeScript check
+        run: npm run check
+
+      - name: Unit tests (Vitest)
+        run: npm run test:unit
+
+      - name: i18n drift check
+        run: node scripts/check-i18n.mjs
+
+      - name: Species-data coverage check
+        run: node scripts/check-species-data.mjs
+
+      - name: Design-token drift check
+        run: node scripts/gen-tokens.mjs --check
+
+      - name: Frontend build
+        run: npm run build
+
+      - name: Bundle-size budget (B3)
+        run: node scripts/check-bundle-size.mjs
+
+      - name: Forbidden Win32 API tripwire
+        shell: pwsh
+        run: ./scripts/check-forbidden-apis.ps1
+
+      - name: Version consistency
+        shell: pwsh
+        run: ./scripts/check-versions.ps1
+
+      - name: Rust tests
+        working-directory: src-tauri
+        run: cargo test --workspace
+
+      - name: Clippy
+        working-directory: src-tauri
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+  worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the private source
+        uses: actions/checkout@v5
+        with:
+          repository: tnqaquocanh-vn/theisle-overlay-src
+          ref: ${{ inputs.source_ref }}
+          token: ${{ secrets.SRC_READ_PAT }}
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - name: Install
+        working-directory: worker
+        run: npm ci
+      - name: Typecheck
+        working-directory: worker
+        run: npm run typecheck
+      - name: Test
+        working-directory: worker
+        run: npm test
+
+  e2e-logic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the private source
+        uses: actions/checkout@v5
+        with:
+          repository: tnqaquocanh-vn/theisle-overlay-src
+          ref: ${{ inputs.source_ref }}
+          token: ${{ secrets.SRC_READ_PAT }}
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Logic specs
+        run: npm run test:e2e:logic
