@@ -58,6 +58,18 @@ jobs:
       - name: Design-token drift check
         run: node scripts/gen-tokens.mjs --check
 
+      - name: Minimap HUD layout drift check
+        # Guarded: the script only exists on the v2 campaign branch until that
+        # work merges. `if -f` keeps the node exit code, so a real drift still
+        # fails; a missing script just skips.
+        shell: bash
+        run: |
+          if [ -f scripts/check-minimap-layout.mjs ]; then
+            node scripts/check-minimap-layout.mjs
+          else
+            echo "scripts/check-minimap-layout.mjs not on this ref — skipped"
+          fi
+
       - name: Frontend build
         run: npm run build
 
