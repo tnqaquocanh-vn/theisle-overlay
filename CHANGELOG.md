@@ -12,6 +12,62 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.45.0] — 2026-09-05
+
+### Sửa
+
+- **Sửa lỗi hiện nhầm người chơi server khác trên bản đồ** (tính năng "cảm nhận hệ
+  sinh thái quanh bạn") — trước đây xác định "cùng server" dựa vào tên hiển thị
+  trong game, nên 2 server khác nhau nhưng trùng/gần giống tên có thể bị nhận
+  nhầm là cùng server. Giờ dùng đúng định danh server thật.
+- **Sửa lỗi cài đặt Npcap (mục Cài đặt → phát hiện người chơi gần đó) luôn báo
+  lỗi** — nút "Cài tự động" trước đây không xin đúng quyền quản trị nên luôn
+  thất bại. Giờ hiện đúng hộp thoại xin quyền (UAC) của Windows rồi cài như
+  cài phần mềm bình thường (Next → Next → Install).
+
+### Thêm
+
+- **Gói Super PRO VIP mới (100.000đ, trọn đời)** — mở khoá tên thật trên chấm
+  người chơi lạ gần đó (bạn tự chọn có muốn hiện tên mình cho người khác thấy
+  hay không) và phạm vi phát hiện rộng hơn. Khách PRO/PRO VIP hiện tại có thể
+  nâng cấp bất cứ lúc nào trong mục Người ủng hộ (giá 100.000đ trọn gói; riêng
+  PRO → PRO VIP vẫn chỉ trả phần chênh lệch 20.000đ như trước).
+
+### Đổi
+
+- **Nhãn loài + cân nặng trên marker và chấm màu quan hệ (ăn thịt/ăn cỏ/cùng
+  loài)** chuyển từ PRO VIP lên Super PRO VIP — áp dụng cho cả khách đã mua PRO
+  VIP trước đây. PRO VIP vẫn thấy chấm người chơi/AI gần đó như cũ, chỉ không
+  còn 2 tính năng trên; nâng lên Super PRO VIP để lấy lại.
+
+### Nội bộ
+
+- `Tier` type + `tierish()`/`TIER_RANK` ladder trong `worker/src/license.ts`,
+  3-way upgrade pricing (`upgradePriceVnd`), `fulfilOrder` bind tier động thay
+  vì hardcode `'vip'`.
+- `worker/src/mesh.ts`: `canViewDetails` per-viewer (supervip only), server-
+  side stripping của `name`/`species`/`growth`/`maxHealth` cho viewer chỉ có
+  vip (`stripToVipDetails`) — không dựa vào client tự ẩn.
+- `is_vip()`/`isVip()` trở thành ladder-inclusive (vip HOẶC supervip); thêm
+  `is_supervip()`/`isSuperVip()` exact-match riêng cho 2 tính năng vừa chuyển
+  tier + tên thật + phạm vi rộng.
+- Setting mới `map.broadcast_name`/`broadcast_name_value` — opt-in publish
+  tên thật, mọi tier, tách biệt hoàn toàn khỏi publish vị trí tự động.
+- Token `tier.vipGold`/`tier.superVipBg`/`tier.superVipText` trong
+  `tokens.data.js` — gộp 3 chỗ hard-code gradient VIP về 1 nguồn, thêm giao
+  diện obsidian+vàng riêng cho Super PRO VIP (khác VIP, không phải re-skin).
+- `worker/src/license.ts` `recover()`: `ORDER BY ... l.issued_at DESC` thiếu
+  tiebreak khi 2 key mint trong cùng 1 giây (granularity `issued_at`) —
+  SQLite trả thứ tự tie không xác định, có thể trả nhầm key cũ hơn. Thêm
+  `l.rowid DESC` làm tiebreak phụ (rowid theo đúng thứ tự insert kể cả bảng
+  TEXT PRIMARY KEY). Phát hiện qua gate CI thật của bản v1.45.0.
+- `src-tauri/src/localpos/npcap.rs`: `install()` chạy file cài Npcap qua
+  `std::process::Command` (CreateProcess thẳng) — Npcap manifest
+  `requireAdministrator`, và CreateProcess không tự bật UAC cho tiến trình
+  không có sẵn quyền admin như Explorer/"Run as administrator" vẫn làm, nên
+  luôn lỗi. Đổi sang `ShellExecuteExW` verb `"runas"` (thêm feature
+  `Win32_UI_Shell` vào `windows` crate).
+
 ## [1.44.0] — 2026-09-04
 
 ### Thêm
