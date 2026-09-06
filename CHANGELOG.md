@@ -12,6 +12,17 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.45.1] — 2026-09-06
+
+### Sửa
+
+- **Sửa lỗi không thấy người chơi nào ở gần** (tính năng "cảm nhận hệ sinh thái
+  quanh bạn") — bản 1.45.0 đổi cách nhận diện server sang dùng địa chỉ panel
+  IslePilot, nhưng với các địa chỉ phổ biến (ví dụ `islepilot.eu` không có tên
+  máy chủ phía trước) thì không suy ra được → app ngừng chia sẻ vị trí luôn,
+  thành ra vừa không thấy ai vừa không ai thấy mình. Giờ khi địa chỉ panel
+  không đủ để nhận diện, quay lại dùng tên server trong game như trước 1.45.0.
+
 ## [1.45.0] — 2026-09-05
 
 ### Sửa
