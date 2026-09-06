@@ -12,6 +12,26 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.45.2] — 2026-09-06
+
+### Sửa
+
+- Giảm RAM của phần xem khủng long 3D, đặc biệt khi bật chế độ tài nguyên thấp
+  hoặc xem nhiều loài liên tiếp.
+- Tăng độ ổn định khi khởi động, tải dữ liệu hoặc chuyển tab trong lúc kết nối
+  native/CDN bị gián đoạn.
+- Ngăn một số yêu cầu thanh toán, dùng thử và gửi phản hồi đồng thời tạo dữ
+  liệu trùng hoặc vượt giới hạn.
+
+### Nội bộ
+
+- Giới hạn kích thước request Worker, hiện đại hóa Durable Object và sinh kiểu
+  binding từ Wrangler.
+- Ghi cache tải xuống nguyên tử và bổ sung kiểm thử cạnh tranh, vòng đời WebGL,
+  hiệu năng cùng game.
+- Trail delta path vẫn opt-in mặc định tắt; cú flip mặc định xếp vào v2/M3 theo
+  luật opt-in-renderer.
+
 ## [1.45.1] — 2026-09-06
 
 ### Sửa
