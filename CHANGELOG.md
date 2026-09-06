@@ -12,6 +12,25 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.45.3] — 2026-09-06
+
+### Sửa
+
+- **Thanh chỉ số đói/khát/thể lực nhảy loạn** khi bật "Cập nhật thời gian thực
+  (WebSocket)" — do lượt hỏi REST (~5 giây) và WebSocket cùng đẩy số, hai bên
+  lệch nhau vài đơn vị nên thanh nhảy tới nhảy lui. Giờ khi WebSocket đang chạy,
+  lượt REST dùng luôn số của WebSocket cho các thanh này (danh sách nhiệm vụ,
+  loài, dinh dưỡng vẫn lấy từ REST như cũ).
+- **Overlay minimap trong game không đổi sang %** dù đã chọn trong ứng dụng —
+  HUD minimap trước đây luôn hiển thị dạng "số/số", không đọc lựa chọn này.
+
+### Đổi
+
+- **Chọn kiểu hiển thị (số hay %) riêng cho từng chỉ số** — Máu, Đói, Khát, Thể
+  lực mỗi cái có nút **%** riêng trên thanh của nó, thay cho một nút gạt chung.
+  Lựa chọn áp dụng cho cả tab Khủng long, cửa sổ companion và HUD minimap. Cài
+  đặt cũ (một kiểu cho tất cả) tự chuyển sang dạng mới.
+
 ## [1.45.2] — 2026-09-06
 
 ### Sửa
