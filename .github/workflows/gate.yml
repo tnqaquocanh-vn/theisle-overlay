@@ -132,6 +132,17 @@ jobs:
       - name: Bundle-size budget (B3)
         run: node scripts/check-bundle-size.mjs
 
+      - name: Entrypoint cold-start budget (M3a)
+        # Guarded — v2-campaign only until it merges. Per-HTML-entry
+        # dependency-closure ceiling on top of the per-chunk B3 budget.
+        shell: bash
+        run: |
+          if [ -f scripts/check-entrypoint-budget.mjs ]; then
+            node scripts/check-entrypoint-budget.mjs
+          else
+            echo "scripts/check-entrypoint-budget.mjs not on this ref — skipped"
+          fi
+
       - name: Forbidden Win32 API tripwire
         shell: pwsh
         run: ./scripts/check-forbidden-apis.ps1
