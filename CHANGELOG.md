@@ -12,6 +12,30 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.45.4] — 2026-09-07
+
+### Sửa
+
+- **Super PRO VIP không tải được bộ Việt hoá** — báo "license không đủ quyền
+  PRO trở lên" dù hạng cao nhất. Cổng kiểm tra phía máy chủ chưa được cập nhật
+  khi thêm hạng Super PRO VIP; giờ mọi hạng trả phí (PRO, PRO VIP, Super PRO
+  VIP) đều tải được.
+- **Chấm người chơi gần đã chết vẫn nằm mãi trên minimap** — khi một người dùng
+  ứng dụng gần bạn chết, thoát trận hoặc đóng game, chấm của họ trước đây bị
+  "đóng băng" tại chỗ và không biến mất. Giờ ứng dụng ngừng phát vị trí ngay khi
+  không còn dữ liệu vị trí mới, nên chấm cũ tự tan sau khoảng một phút; phía
+  người xem cũng bỏ luôn chấm báo 0% máu.
+- **Link nâng hạng nhanh tạo sai mã** — người dùng PRO bấm link "Nâng lên PRO VIP
+  — chỉ +20k" trong thẻ tài khoản lại nhận mã Super PRO VIP 100.000đ. Giờ link
+  tạo đúng đơn theo nhãn của nó (PRO → PRO VIP +20k, PRO VIP → Super PRO VIP
+  100k). Các nút nâng hạng lớn phía dưới vốn đã đúng.
+
+### Nội bộ
+
+- Thêm cờ chẩn đoán `debug.realtime_diag` (mặc định tắt): ghi 24 khung đầu của
+  socket thời gian thực — chỉ số dạng số + độ dời vị trí (không ghi toạ độ tuyệt
+  đối) — để truy lỗi nhảy chỉ số / nhảy vị trí.
+
 ## [1.45.3] — 2026-09-06
 
 ### Sửa
