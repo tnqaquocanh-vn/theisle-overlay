@@ -56,15 +56,41 @@ jobs:
       - name: Unit tests (Vitest)
         run: npm run test:unit
 
-      - name: Install Playwright Chromium
+      - name: Install Playwright Chromium (pinned by the lockfile)
         run: npx playwright install chromium
 
+      - name: Record the canonical environment (to the job log)
+        # R1a — no upload-artifact (the R-10 audit keeps these workflows
+        # artifact-free). Printed so a screenshot drift after a GitHub
+        # runner-image bump is diagnosable from the log alone. Baseline
+        # (re)capture is done LOCALLY on Windows under option B.
+        shell: pwsh
+        run: |
+          $pw = (npm ls @playwright/test --json | ConvertFrom-Json).dependencies.'@playwright/test'.version
+          [ordered]@{
+            imageVersion = $env:ImageVersion
+            osBuild      = (Get-CimInstance Win32_OperatingSystem).BuildNumber
+            runner       = "$env:RUNNER_OS $env:RUNNER_ARCH"
+            playwright   = $pw
+            chromium     = "$(npx playwright --version)"
+            node         = "$(node --version)"
+            sourceRef    = "${{ inputs.source_ref }}"
+          } | ConvertTo-Json
+          if (Test-Path node_modules/@fontsource) {
+            "--- @fontsource woff2 SHA256 ---"
+            Get-ChildItem -Recurse -Filter *.woff2 node_modules/@fontsource |
+              Get-FileHash -Algorithm SHA256 |
+              ForEach-Object { "{0}  {1}" -f $_.Hash, ($_.Path -replace [regex]::Escape($PWD.Path), '') }
+          }
+
       - name: Visual regression specs
-        # Screenshot baselines are per-OS (*-chromium-win32.png), which is why
-        # this runs in the `app` job specifically — it's the only windows-latest
-        # job in the gate. Excludes @logic (perf/behaviour specs, no screenshot
-        # assertions) since those already run cross-platform in e2e-logic below;
-        # running them twice would be redundant, not extra coverage.
+        # R1b — BLOCKING. Screenshot baselines are Windows (*-chromium-win32.png)
+        # so this runs in the `app` job (the pinned windows-2022 canonical env);
+        # playwright.config.ts's 2 CI retries absorb a residual sub-pixel blip
+        # while a real regression fails all three. Excludes @logic (no
+        # screenshot assertions — they run in e2e-logic). A spec that stays
+        # flaky is quarantined by name (test.skip + tracking issue + <=14-day
+        # deadline), never by softening this step.
         run: npm run test:visual:screens
 
       - name: i18n drift check
@@ -86,6 +112,18 @@ jobs:
             node scripts/check-minimap-layout.mjs
           else
             echo "scripts/check-minimap-layout.mjs not on this ref — skipped"
+          fi
+
+      - name: Legacy --color-* budget ratchet (M3a)
+        # Guarded like the layout check — v2-campaign only until it merges. The
+        # count of var(--color-*) references may only ever drop as M3b/M3c
+        # migrate call sites onto tokens / @theme utilities.
+        shell: bash
+        run: |
+          if [ -f scripts/check-color-token-budget.mjs ]; then
+            node scripts/check-color-token-budget.mjs
+          else
+            echo "scripts/check-color-token-budget.mjs not on this ref — skipped"
           fi
 
       - name: Frontend build
