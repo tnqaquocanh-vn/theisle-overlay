@@ -28,10 +28,15 @@ jobs:
     with:
       source_ref: ${{ github.event.inputs.source_ref }}
 
-  # Screenshot regression only. Machine-specific baselines -> reports, never
-  # fails (continue-on-error), same as before.
+  # Screenshot regression (R1, v2 campaign — option B: canonical env is Windows,
+  # deliberately pinned). runs-on is windows-2022, NEVER windows-latest; Chromium
+  # comes from the exact lockfile-pinned @playwright/test; fonts are the
+  # repo-bundled @fontsource packages; playwright.config.ts pins DPR / locale /
+  # timezone / colour scheme / motion. Still continue-on-error until R1b flips it
+  # (after >=3 consecutive green runs). A spec that stays flaky after that is
+  # quarantined by name — this flag never comes back for the whole job.
   visual:
-    runs-on: windows-latest
+    runs-on: windows-2022
     continue-on-error: true
     steps:
       - name: Check out the private source
@@ -47,7 +52,31 @@ jobs:
           cache: npm
       - name: Install frontend dependencies
         run: npm ci
-      - name: Install Playwright Chromium
+      - name: Install Playwright Chromium (pinned by the lockfile)
         run: npx playwright install chromium
+      - name: Record the canonical environment (to the job log)
+        # No upload-artifact here on purpose: the R-10 audit keeps the
+        # dispatch-triggered public workflows artifact-free. The manifest is
+        # printed so a drift after a runner-image bump is diagnosable from the
+        # log alone. Baseline (re)capture is done LOCALLY on Windows under
+        # option B — see docs/ci-r10/README / the campaign plan R1a.
+        shell: pwsh
+        run: |
+          $pw = (npm ls @playwright/test --json | ConvertFrom-Json).dependencies.'@playwright/test'.version
+          [ordered]@{
+            imageVersion = $env:ImageVersion
+            osBuild      = (Get-CimInstance Win32_OperatingSystem).BuildNumber
+            runner       = "$env:RUNNER_OS $env:RUNNER_ARCH"
+            playwright   = $pw
+            chromium     = "$(npx playwright --version)"
+            node         = "$(node --version)"
+            sourceRef    = "${{ github.event.inputs.source_ref }}"
+          } | ConvertTo-Json
+          if (Test-Path node_modules/@fontsource) {
+            "--- @fontsource woff2 SHA256 ---"
+            Get-ChildItem -Recurse -Filter *.woff2 node_modules/@fontsource |
+              Get-FileHash -Algorithm SHA256 |
+              ForEach-Object { "{0}  {1}" -f $_.Hash, ($_.Path -replace [regex]::Escape($PWD.Path), '') }
+          }
       - name: Screenshot specs
         run: npm run test:visual:screens

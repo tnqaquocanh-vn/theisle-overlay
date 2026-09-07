@@ -1,8 +1,15 @@
 # PUBLIC repo (tnqaquocanh-vn/theisle-overlay) — reusable gate.
 #
-# Identical checks to the old private-repo gate; the only addition is the first
-# step: check out the PRIVATE source at `source_ref` via SRC_READ_PAT. Called by
-# ci.yml (branch pushes) and release.yml (tags) with `secrets: inherit`.
+# Checks out the PRIVATE source at `source_ref` via SRC_READ_PAT, then runs the
+# same checks the old private-repo gate did. Called by ci.yml (branch pushes)
+# and release.yml (tags) with `secrets: inherit`.
+#
+# R1 (v2 campaign): the `app` job is pinned to `windows-2022` (never
+# `windows-latest`) — it is the canonical environment for `test:visual:screens`,
+# which runs here as a BLOCKING step. playwright.config.ts (in the checked-out
+# source) pins the rest: exact @playwright/test, DPR, locale, timezone, colour
+# scheme, motion. ci.yml keeps a second non-blocking `visual` job as a canary
+# that also records the runner env manifest.
 
 on:
   workflow_call:
@@ -15,7 +22,7 @@ on:
 
 jobs:
   app:
-    runs-on: windows-latest
+    runs-on: windows-2022
     env:
       CARGO_TARGET_DIR: ${{ github.workspace }}\target
     steps:
