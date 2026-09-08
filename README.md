@@ -253,3 +253,4 @@ Phát triển bởi **BumBum**.
   hoặc dùng nút **Gửi phản hồi** ngay trong Cài đặt › Nâng cao.
 - ❤️ Ủng hộ: mua gói **PRO / PRO VIP** trong Cài đặt › Tài khoản (VietQR / Ko-fi).
   Lõi bản đồ luôn miễn phí — gói chỉ mở thêm tiện ích và giúp dự án đi tiếp.
+  Hoặc có thể liên hệ trực tiếp qua discord của mình: .bumxilabum
