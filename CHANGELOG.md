@@ -12,6 +12,25 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.45.5] — 2026-09-09
+
+### Thêm
+
+- **Super PRO VIP: chỉnh phạm vi quét lân cận (1–3 km)** — thêm thanh trượt
+  trong mục Bản đồ để chỉ hiện người lạ trong khoảng cách bạn chọn tính từ chấm
+  của mình; để tối đa là giữ nguyên như trước.
+- **Super PRO VIP: nhãn khoảng cách trên chấm lân cận** — mỗi chấm người lạ nay
+  kèm khoảng cách tới bạn (vd "2,1km"). Chấm đồng đội trong nhóm sinh tồn không
+  đổi.
+
+### Sửa
+
+- **Chấm quét lân cận vẫn còn khi người chơi mất tín hiệu / thoát game** — bản
+  v1.45.4 mới chỉ xử lý trường hợp nguồn vị trí ngừng hẳn. Nếu IslePilot cứ trả
+  về đúng một toạ độ đông cứng cho người đã thoát, "mẫu" vẫn về đều nên bộ lọc
+  cũ không nhận ra. Giờ ứng dụng ngừng phát khi (a) IslePilot báo người chơi
+  offline, hoặc (b) vị trí không hề nhúc nhích suốt 2 phút — chấm tự tan sau đó.
+
 ## [1.45.4] — 2026-09-07
 
 ### Sửa
