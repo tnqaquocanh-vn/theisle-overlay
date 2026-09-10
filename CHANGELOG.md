@@ -12,6 +12,17 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.45.7] — 2026-09-10
+
+### Sửa
+
+- **Một người chơi hiện thành cả "bầy" chấm trên radar lân cận** — người đứng
+  ngay trên ranh giới ô lưới 1,2 km khiến ứng dụng của họ nối lại liên tục,
+  mỗi lần lại tạo một chấm mới còn lưu ~45 giây → một người thành 5-10 chấm
+  ma cho mọi người quanh đó. Giờ chỉ đổi ô khi đã vào hẳn ô mới ≥50 m.
+- **Nhãn chồng lên nhau khi đông người** — bản đồ chỉ hiện nhãn cố định cho ~5
+  chấm gần nhất; các chấm còn lại rê chuột vào mới hiện.
+
 ## [1.45.6] — 2026-09-10
 
 ### Sửa
