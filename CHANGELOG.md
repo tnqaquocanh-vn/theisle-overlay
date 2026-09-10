@@ -12,6 +12,18 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.45.6] — 2026-09-10
+
+### Sửa
+
+- **Radar lân cận đôi khi hiện chính bạn** — bản v1.45.5 để lọt chấm của bản
+  thân vào danh sách người lạ (thấy rõ nhất vì nhãn khoảng cách ghi "0m"), và
+  sau khi bạn đi qua ranh giới một vùng thì còn một "bóng ma" của bạn đứng ở
+  chỗ cũ vài chục giây. Giờ đã lọc sạch qua mọi lần đổi vùng / đổi định danh.
+- **Nhãn khoảng cách trên minimap bị đứng số** — với một con vật đứng yên, khi
+  bạn di chuyển lại gần/xa thì số km trên nhãn không đổi. Giờ cập nhật theo mỗi
+  ~50 m.
+
 ## [1.45.5] — 2026-09-09
 
 ### Thêm
