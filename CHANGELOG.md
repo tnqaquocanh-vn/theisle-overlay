@@ -12,6 +12,14 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [1.45.8] — 2026-09-15
+
+### Nội bộ
+
+- Giảm chi phí hạ tầng máy chủ: giãn nhịp tín hiệu "còn hoạt động" khi người
+  chơi đứng yên lâu (radar lân cận), và nới nhịp gộp cập nhật danh sách phòng
+  đội — không đổi bất kỳ hành vi hay hiển thị nào người dùng thấy.
+
 ## [1.45.7] — 2026-09-10
 
 ### Sửa
