@@ -12,6 +12,37 @@ tự cắt phần đó khỏi thông báo người dùng thấy.
 
 ## [Chưa phát hành]
 
+## [2.0.2] — 2026-09-28
+
+### Sửa
+
+- Phần trăm trưởng thành trên Minimap cập nhật ổn định hơn khi trạng thái trong game thay đổi.
+- Trạng thái Prime và ba chỉ số dinh dưỡng trên Minimap luôn hiển thị theo dữ liệu mới nhất.
+- Mục “Theo dõi & cảnh báo” giữ nguyên trạng thái mở khi thông tin khủng long cập nhật.
+- Minimap nhỏ cũng hiển thị dạng số khi bạn chọn số thay cho phần trăm trong tab Khủng long.
+
+## [2.0.1] — 2026-09-27
+
+### Đổi
+
+- Sửa tràn 1px ở thanh chrome hẹp và giữ nhận diện hạng hiển thị đúng trên cửa sổ nhỏ.
+
+## [2.0.0] — 2026-09-26
+
+### Thêm
+
+- Thêm nút **Discord** ở góc phải cửa sổ Main để mở cộng đồng/hỗ trợ chính thức.
+- Hoàn thiện kênh Stable/Beta/Dev, cô lập dữ liệu theo kênh và luồng khôi phục về Stable.
+
+### Ghi chú
+
+- DINORP-protected real-server admission hiện từ chối Overplay khi overlay đang chạy. Hãy thoát overlay trước khi vào môi trường có chính sách này; không có bypass. Điều tra allowlist/SDK được hoãn sau phát hành.
+- Redesign riêng BigMap và bản dịch tên/mô tả mutation trong game vẫn được hoãn sau v2.
+
+### Nội bộ
+
+- Bản Stable chính thức đã được phát hành; DINORP limitation và các hạng mục sau v2 vẫn được ghi rõ ở trên.
+
 ## [1.45.8] — 2026-09-15
 
 ### Nội bộ
