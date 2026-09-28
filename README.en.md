@@ -11,7 +11,7 @@ while playing, and a number of features not in the original.
 - **Your Dino** (growth, health/hunger/thirst/stamina, nutrition, Prime) + **Garage** with 3D preview + a **skin editor** that exports codes you paste straight into the game — via IslePilot, one Steam login **for every server**.
 - **Companion window** for a second monitor · bilingual VI/EN interface · one-click install with auto-update.
 
-![Minimap and dino stats over the running game](docs/screenshot-ingame.jpg)
+![Minimap and dino stats over the running game](docs/images/v2/hud-context.png)
 
 ## Contents
 
@@ -28,7 +28,7 @@ while playing, and a number of features not in the original.
 
 ## Features
 
-![Full map with place names, player labels and POI layers](docs/screenshot-fullmap.png)
+![Full map with place names, player labels and POI layers](docs/images/v2/overview.png)
 
 **Map**
 
@@ -257,3 +257,4 @@ Developed by **BumBum**.
   or use the **Send feedback** button in Settings › Advanced.
 - ❤️ Support: buy **PRO / PRO VIP** in Settings › Account (VietQR / Ko-fi). The
   map core is always free — the tiers add extras and keep the project going.
+

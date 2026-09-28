@@ -11,7 +11,7 @@ gần như bằng 0, và nhiều tính năng riêng không có ở bản gốc.
 - **Khủng long của bạn** (growth, máu/đói/khát/thể lực, dinh dưỡng, Prime) + **Garage** xem 3D + **trình chỉnh skin** xuất mã dán thẳng vào game — qua IslePilot, đăng nhập Steam **một lần cho mọi server**.
 - **Màn hình phụ** cho monitor thứ hai · giao diện song ngữ Việt/Anh · cài một lần, tự cập nhật.
 
-![Bản đồ nhỏ và chỉ số khủng long đè lên game](docs/screenshot-ingame.jpg)
+![Bản đồ nhỏ và chỉ số khủng long đè lên game](docs/images/v2/hud-context.png)
 
 ## Mục lục
 
@@ -28,7 +28,7 @@ gần như bằng 0, và nhiều tính năng riêng không có ở bản gốc.
 
 ## Tính năng
 
-![Bản đồ lớn với tên địa danh, nhãn người chơi và các lớp POI](docs/screenshot-fullmap.png)
+![Bản đồ lớn với tên địa danh, nhãn người chơi và các lớp POI](docs/images/v2/overview.png)
 
 **Bản đồ**
 
@@ -253,4 +253,5 @@ Phát triển bởi **BumBum**.
   hoặc dùng nút **Gửi phản hồi** ngay trong Cài đặt › Nâng cao.
 - ❤️ Ủng hộ: mua gói **PRO / PRO VIP** trong Cài đặt › Tài khoản (VietQR / Ko-fi).
   Lõi bản đồ luôn miễn phí — gói chỉ mở thêm tiện ích và giúp dự án đi tiếp.
-  Hoặc có thể liên hệ trực tiếp qua discord của mình: .bumxilabum hoặc https://discord.gg/qB6FVHu7D
+
+
